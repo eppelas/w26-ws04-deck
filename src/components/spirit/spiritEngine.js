@@ -58,63 +58,154 @@ const CONFIG = {
 
 // ─── VOXEL CHARACTER MODEL ──────────────────────────────────
 // Each voxel: [x, y, z, colorIndex]
-// colorIndex: 0=black, 1=gray, 2=red, 3=white, 4=dark-gray, 5=light-gray
+// colorIndex: 0=black, 1=gray, 2=red, 3=white, 4=dark-gray, 5=light-gray, 6=blush
 
 const COLORS = [BLACK, GRAY, RED, WHITE, '#333333', '#AAAAAA', 'rgba(220,38,38,0.5)']
 
-function buildCharacterModel() {
+// growth: 0.0 (start) → 1.0 (end of presentation)
+// The character literally grows: taller body, crown branches, red aura, wider stance
+function buildCharacterModel(growth = 0) {
   const voxels = []
   const v = (x, y, z, c) => voxels.push([x, y, z, c])
 
-  // === BODY (dark core with gray shell) ===
-  // torso — 3 wide, 4 tall, 2 deep
-  for (let y = 0; y < 4; y++) {
-    for (let x = -1; x <= 1; x++) {
-      v(x, y, 0, y < 2 ? 0 : 4) // front face
-      if (y < 3) v(x, y, 1, 4)   // back
+  // growth stages: seed(0-0.15) → sprout(0.15-0.35) → growing(0.35-0.6) → blooming(0.6-0.85) → full(0.85-1.0)
+  const g = Math.max(0, Math.min(1, growth))
+
+  // === BASE BODY ===
+  const bodyHeight = Math.floor(2 + g * 3) // 2→5 tall
+  const bodyWidth = g > 0.3 ? 1 : 0        // widens at 30%
+  for (let y = 0; y < bodyHeight; y++) {
+    for (let x = -bodyWidth; x <= bodyWidth; x++) {
+      v(x, y, 0, y < 2 ? 0 : 4)
+      if (y < bodyHeight - 1) v(x, y, 1, 4)
     }
   }
-  // shoulders wider
-  v(-2, 3, 0, 1); v(2, 3, 0, 1)
 
-  // === HEAD (larger, rounder, on top of body) ===
-  // 5 wide, 5 tall, 3 deep — main head block
-  for (let y = 4; y < 9; y++) {
-    for (let x = -2; x <= 2; x++) {
+  // shoulders (appear at 20%)
+  if (g > 0.2) {
+    const sw = g > 0.5 ? 2 : 1
+    v(-sw, bodyHeight - 1, 0, 1)
+    v(sw, bodyHeight - 1, 0, 1)
+  }
+
+  // === HEAD (always present, grows) ===
+  const headBase = bodyHeight
+  const headSize = g > 0.5 ? 2 : (g > 0.15 ? 2 : 1)
+  const headTop = headBase + 3 + Math.floor(g * 2) // taller head as grows
+
+  for (let y = headBase; y < headTop; y++) {
+    for (let x = -headSize; x <= headSize; x++) {
       for (let z = -1; z <= 1; z++) {
-        // skip corners for rounder shape
-        if (Math.abs(x) === 2 && Math.abs(z) === 1 && (y === 4 || y === 8)) continue
-        if (Math.abs(x) === 2 && y === 8) continue
-        v(x, y, z, 0) // dark head
+        if (Math.abs(x) === headSize && Math.abs(z) === 1 && (y === headBase || y === headTop - 1)) continue
+        if (Math.abs(x) === headSize && y === headTop - 1) continue
+        v(x, y, z, 0)
       }
     }
   }
-  // top of head — smaller
-  v(-1, 9, 0, 0); v(0, 9, 0, 0); v(1, 9, 0, 0)
+  // head crown row
+  v(-1, headTop, 0, 0); v(0, headTop, 0, 0); v(1, headTop, 0, 0)
 
-  // === EYES (white with dark pupil) ===
-  v(-1, 7, -2, 3) // left eye white
-  v(1, 7, -2, 3)  // right eye white
+  // === EYES ===
+  const eyeY = headBase + Math.floor((headTop - headBase) * 0.6)
+  v(-1, eyeY, -2, 3)
+  v(1, eyeY, -2, 3)
 
-  // === BLUSH (subtle red under eyes) ===
-  v(-2, 6, -1, 6) // left blush (semi-transparent red)
-  v(2, 6, -1, 6)  // right blush
+  // === BLUSH (appears at 25%) ===
+  if (g > 0.25) {
+    v(-headSize, eyeY - 1, -1, 6)
+    v(headSize, eyeY - 1, -1, 6)
+  }
 
-  // === AIM GLYPH (red mark on forehead) ===
-  v(0, 8, -2, 2)  // center red dot
+  // === AIM GLYPH (grows brighter with progress) ===
+  v(0, headTop - 1, -2, 2)
+  if (g > 0.4) {
+    v(-1, headTop - 1, -2, 2) // wider glyph
+    v(1, headTop - 1, -2, 2)
+  }
 
-  // === LEGS ===
-  v(-1, -1, 0, 4); v(-1, -2, 0, 1) // left leg
-  v(1, -1, 0, 4);  v(1, -2, 0, 1)  // right leg
+  // === LEGS (grow longer) ===
+  const legLen = 1 + Math.floor(g * 2) // 1→3
+  for (let i = 1; i <= legLen; i++) {
+    v(-1, -i, 0, i === legLen ? 1 : 4)
+    v(1, -i, 0, i === legLen ? 1 : 4)
+  }
+  // feet
+  v(-1, -legLen - 1, 0, 1); v(-1, -legLen - 1, -1, 1)
+  v(1, -legLen - 1, 0, 1);  v(1, -legLen - 1, -1, 1)
 
-  // === FEET ===
-  v(-1, -3, 0, 1); v(-1, -3, -1, 1)
-  v(1, -3, 0, 1);  v(1, -3, -1, 1)
+  // ═══ GROWTH FEATURES (branches, crown, etc.) ═══
+
+  // === BRANCHES from shoulders (appear at 35%) ===
+  if (g > 0.35) {
+    const branchLen = Math.floor(1 + (g - 0.35) * 6) // 1→5
+    for (let i = 1; i <= branchLen; i++) {
+      // left branch goes up-left
+      v(-headSize - i, bodyHeight + i - 1, 0, i % 2 === 0 ? 2 : 1)
+      // right branch goes up-right
+      v(headSize + i, bodyHeight + i - 1, 0, i % 2 === 0 ? 2 : 1)
+    }
+    // branch tips get red leaves at 50%
+    if (g > 0.5) {
+      const tip = branchLen
+      v(-headSize - tip, bodyHeight + tip, 0, 2)
+      v(-headSize - tip + 1, bodyHeight + tip, 0, 2)
+      v(headSize + tip, bodyHeight + tip, 0, 2)
+      v(headSize + tip - 1, bodyHeight + tip, 0, 2)
+    }
+  }
+
+  // === CROWN / ANTENNA (appears at 50%) ===
+  if (g > 0.5) {
+    const crownH = Math.floor(1 + (g - 0.5) * 6) // 1→4
+    for (let i = 1; i <= crownH; i++) {
+      v(0, headTop + i, 0, i === crownH ? 2 : 4)
+    }
+    // crown spreads at 70%
+    if (g > 0.7) {
+      const top = headTop + crownH
+      v(-1, top, 0, 2); v(1, top, 0, 2)
+      v(-2, top - 1, 0, 2); v(2, top - 1, 0, 2)
+    }
+    // crown blooms at 85%
+    if (g > 0.85) {
+      const top = headTop + crownH
+      v(0, top + 1, 0, 2)
+      v(-1, top + 1, 0, 2); v(1, top + 1, 0, 2)
+      v(0, top + 2, 0, 2)
+      // side sprouts
+      v(-3, headTop + 1, 0, 1); v(-3, headTop + 2, 0, 2)
+      v(3, headTop + 1, 0, 1); v(3, headTop + 2, 0, 2)
+    }
+  }
+
+  // === BODY DETAIL / PATTERN (appears at 40%) ===
+  if (g > 0.4 && bodyHeight > 3) {
+    v(0, 2, -1, 2) // red heart/core
+    if (g > 0.6) {
+      v(-1, 2, -1, 2); v(1, 2, -1, 2) // wider core
+    }
+  }
+
+  // === AURA VOXELS (floating around, appear at 60%) ===
+  if (g > 0.6) {
+    const auraCount = Math.floor((g - 0.6) * 12) // 0→5
+    const auraPositions = [
+      [-4, headTop - 2, -1], [4, headTop - 2, -1],
+      [-3, bodyHeight + 3, 2], [3, bodyHeight + 3, 2],
+      [0, headTop + 5, 0],
+    ]
+    for (let i = 0; i < Math.min(auraCount, auraPositions.length); i++) {
+      const [ax, ay, az] = auraPositions[i]
+      v(ax, ay, az, i % 2 === 0 ? 2 : 5) // alternating red and light-gray
+    }
+  }
 
   return voxels
 }
 
-const CHARACTER_MODEL = buildCharacterModel()
+// cache to avoid rebuilding every frame
+let cachedGrowth = -1
+let cachedModel = buildCharacterModel(0)
 
 // ═══════════════════════════════════════════════════════════════
 
@@ -214,8 +305,12 @@ export function createSpiritEngine(canvas) {
 
   function drawAmbientVoxels(cx, cy) {
     const phase = getPhaseData()
-    ctx.globalAlpha = phase.glyphOpacity * 0.25
-    for (const av of ambientVoxels) {
+    const growth = totalSlides > 1 ? slideIndex / (totalSlides - 1) : 0
+    // more ambient voxels visible as character grows
+    const visibleCount = Math.floor(2 + growth * 4)
+    ctx.globalAlpha = phase.glyphOpacity * (0.15 + growth * 0.2)
+    for (let idx = 0; idx < Math.min(visibleCount, ambientVoxels.length); idx++) {
+      const av = ambientVoxels[idx]
       const px = cx + av.offsetX + Math.sin(time * av.speed + av.phase) * 8
       const py = cy + av.offsetY + Math.cos(time * av.speed * 0.7 + av.phase) * 4
       ctx.save()
@@ -444,6 +539,14 @@ export function createSpiritEngine(canvas) {
     const phase = getPhaseData()
     const vs = CONFIG.voxelSize * CONFIG.scale
 
+    // rebuild model if growth changed (quantized to 0.02 steps)
+    const growth = totalSlides > 1 ? slideIndex / (totalSlides - 1) : 0
+    const quantizedGrowth = Math.round(growth * 50) / 50
+    if (quantizedGrowth !== cachedGrowth) {
+      cachedGrowth = quantizedGrowth
+      cachedModel = buildCharacterModel(quantizedGrowth)
+    }
+
     ctx.save()
 
     const floatY = Math.sin(ch.floatPhase) * 2
@@ -457,12 +560,13 @@ export function createSpiritEngine(canvas) {
     ctx.rotate(ch.tilt * 0.5)
     ctx.translate(-baseX, -baseY)
 
-    // shadow — isometric ellipse on ground
+    // shadow — grows with character
+    const shadowSize = 14 + growth * 12
     ctx.save()
-    ctx.globalAlpha = 0.08
+    ctx.globalAlpha = 0.06 + growth * 0.04
     ctx.fillStyle = BLACK
     ctx.beginPath()
-    ctx.ellipse(baseX, baseY + 25, 18, 5, 0, 0, Math.PI * 2)
+    ctx.ellipse(baseX, baseY + 25 + growth * 8, shadowSize, 4 + growth * 2, 0, 0, Math.PI * 2)
     ctx.fill()
     ctx.restore()
 
@@ -471,7 +575,7 @@ export function createSpiritEngine(canvas) {
     const legSwing = ch.sleeping ? 0 : Math.sin(ch.legPhase) * Math.min(speed * 2, 4)
 
     // sort voxels for proper isometric layering (back to front)
-    const sorted = [...CHARACTER_MODEL].sort((a, b) => {
+    const sorted = [...cachedModel].sort((a, b) => {
       return (a[2] - b[2]) || (a[1] - b[1]) || (a[0] - b[0])
     })
 
@@ -485,23 +589,29 @@ export function createSpiritEngine(canvas) {
         ox += (isLeft ? legSwing : -legSwing) * 0.3
       }
 
-      // arm swing (shoulders)
-      if (vy === 3 && Math.abs(vx) === 2) {
+      // arm/shoulder swing
+      const bodyH = Math.floor(2 + growth * 3)
+      if (vy === bodyH - 1 && Math.abs(vx) >= 2) {
         const isLeft = vx < 0
         oy += Math.sin(ch.legPhase + (isLeft ? 0 : Math.PI)) * Math.min(speed, 1) * 0.3
       }
 
-      // glyph opacity for red forehead mark
+      // branch sway (voxels far from center x)
+      if (Math.abs(vx) > 3) {
+        ox += Math.sin(time * 1.5 + vy * 0.5) * 0.3
+        oy += Math.cos(time * 1.2 + vx * 0.3) * 0.15
+      }
+
+      // glyph/red opacity
       if (ci === 2) {
         ctx.globalAlpha = phase.glyphOpacity
       } else if (ci === 6) {
         ctx.globalAlpha = phase.glyphOpacity * 0.3
-      } else if (ci === 3 && vy === 7) {
+      } else if (ci === 3) {
         // eyes — blink
         if (ch.blinkState) {
           color = BLACK
         } else {
-          // eye tracking toward mouse
           const pdx = mouse.x - ch.x
           const pdy = mouse.y - ch.y
           const pd = Math.sqrt(pdx * pdx + pdy * pdy)
@@ -511,6 +621,11 @@ export function createSpiritEngine(canvas) {
           }
         }
         ctx.globalAlpha = 1
+      } else if (ci === 5) {
+        // aura voxels — float and pulse
+        ox += Math.sin(time * 2 + vx) * 0.5
+        oy += Math.cos(time * 1.5 + vy) * 0.4
+        ctx.globalAlpha = 0.5 + Math.sin(time * 3 + vx + vy) * 0.3
       } else {
         ctx.globalAlpha = 1
       }
