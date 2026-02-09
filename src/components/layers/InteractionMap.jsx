@@ -10,7 +10,7 @@ const INITIAL_OFFSET_X = 100
 const INITIAL_OFFSET_Y = 150
 const GRID_X_SPACING = 380
 const GRID_Y_SPACING = 320
-const STORAGE_KEY = 'interaction_map_nodes_v1'
+const STORAGE_KEY = 'interaction_map_nodes_v2'
 
 export default function InteractionMap({ onBack }) {
   const [nodes, setNodes] = useState(() => {
