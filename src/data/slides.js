@@ -77,9 +77,6 @@ const slides = [
     type: "recap",
     title: "WS01: Prompt Engineering",
     speaker: "Александр Поваляев",
-    date: "19 января",
-    tagline: "Поведение > технологии",
-    tools: ["ChatGPT", "Claude", "Gemini", "DeepSeek", "Perplexity"],
     items: [
       "Модели — это не магия, а интерфейсы с ограничениями",
       "Каждая модель видит мир по-своему (GPT, Claude, Gemini, DeepSeek)",
@@ -97,9 +94,6 @@ const slides = [
     type: "recap",
     title: "WS02: Context Engineering",
     speaker: "Сергей Хабаров",
-    date: "26 января",
-    tagline: "Контекст > промпт",
-    tools: ["Claude Projects", "GPT Projects", "NotebookLM", "Custom Instructions"],
     items: [
       "Контекст — это всё, что нужно знать, чтобы помочь именно тебе",
       "Контекст-алхимия: смешивай ингредиенты и смотри, что получится",
@@ -108,27 +102,6 @@ const slides = [
       "Кривая обучения: энтузиазм → кризис реальности → интеграция",
     ],
     quote: "Если у кого-то есть «зачем», тот выдержит почти любое «как».",
-  },
-
-  {
-    id: 'ws03-recap',
-    block: 1,
-    blockTitle: "Recap",
-    type: "recap",
-    title: "WS03: Mind Engineering",
-    speaker: "Анна Лозицкая",
-    date: "2 февраля",
-    tagline: "Осознанность > скорость",
-    slidesUrl: "https://w26-ws03-ethics.netlify.app",
-    items: [
-      "Эпидемия одиночества: недостаток реальных связей опаснее курения 15 сигарет в день",
-      "AI — машина по предсказанию текста, не думающая история",
-      "Этика AI: спектр от e/acc до doomer — важно осознанно выбрать позицию",
-      "12-point safety framework для AI-коуча от Jocelyn Skillman",
-      "Phil Stutz Framework: тело, люди, отношения с собой",
-    ],
-    quote: "Ты хорошо умеешь думать о чувствах, но реже быть в них.",
-    tools: ["ChatGPT Projects", "Hume AI", "Monologue", "Gemini"],
   },
 
   {
@@ -145,6 +118,99 @@ const slides = [
       "Гонять черновик промпта между нейронками: GPT → Claude → Gemini → и обратно",
       "Контекст о себе — это процесс, он становится лучше со временем",
     ],
+  },
+
+  {
+    id: 8,
+    block: 1,
+    blockTitle: "Recap",
+    type: "voices",
+    title: "Что вы сказали",
+    subtitle: "Голоса участников",
+    items: [
+      { text: "Cursor/Windsurf не только для кода, но и для текста.", tag: "WS01" },
+      { text: "Понимание роли контекста. Я даже стал активнее слушать людей, поняв, как контекст работает.", tag: "WS01" },
+      { text: "Вернул чувство цифровой свободы. Никаких ограничений нету.", tag: "Tools" },
+      { text: "Это лаборатория, где расширяется представление. Майндсет накапливается.", tag: "WS01" },
+    ],
+  },
+
+  // ═══════════════════════════════════════════
+  // CHECK-IN POLLS (Zoom Questions)
+  // ═══════════════════════════════════════════
+
+  {
+    id: 4,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Как ты себя чувствуешь?",
+    subtitle: "Zoom Poll",
+    voxel: "/voxels/slide1-builder.html",
+    options: [
+      { svg: "overwhelmed", label: "Overwhelmed", desc: "Слишком много всего" },
+      { svg: "excited", label: "Excited", desc: "Хочу больше" },
+      { svg: "confused", label: "Confused", desc: "Пока не понимаю, куда это все" },
+      { svg: "calm", label: "Calm", desc: "Начинаю разбираться" },
+    ],
+  },
+
+  {
+    id: 5,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Где ты на шкале AI?",
+    subtitle: "1-10",
+    svg: "scale",
+    open: true,
+    scale: { min: 1, max: 10, labelMin: "Знаю что существует", labelMax: "Не могу без AI прожить день" },
+  },
+
+  {
+    id: 6,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Что было самым полезным?",
+    subtitle: "Zoom Chat",
+    svg: "useful",
+    open: true,
+    prompt: "Одна вещь из трех недель, которая реально изменила что-то в твоей жизни или работе",
+  },
+
+  {
+    id: 7,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Что ты уже сделал с помощью AI?",
+    subtitle: "Zoom Poll",
+    voxel: "/voxels/slide3-steps.html",
+    options: [
+      { svg: "calm", label: "Пока ничего", desc: "Но собираюсь" },
+      { svg: "confused", label: "Промпты", desc: "Попробовал(а) разные модели" },
+      { svg: "useful", label: "Для работы", desc: "Создал(а) что-то полезное" },
+      { svg: "progress", label: "Свой инструмент", desc: "Построил(а) приложение или автоматизацию" },
+    ],
+  },
+
+  {
+    id: 'poll-results-1',
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll-results",
+    title: "Результаты: как вы себя чувствуете",
+    subtitle: "45 из 56 участников (80%)",
+    total: 45,
+    voxel: "/voxels/slide1-builder.html",
+    results: [
+      { svg: "calm", label: "Calm", desc: "Начинаю разбираться", count: 22, pct: 49 },
+      { svg: "excited", label: "Excited", desc: "Хочу больше", count: 13, pct: 29 },
+      { svg: "confused", label: "Confused", desc: "Пока не понимаю, куда это все", count: 8, pct: 18 },
+      { svg: "overwhelmed", label: "Overwhelmed", desc: "Слишком много всего", count: 2, pct: 4 },
+    ],
+    note: "Почти половина группы уже в спокойном рабочем режиме. Это хороший сигнал к четвертой неделе.",
   },
 
   // ═══════════════════════════════════════════
@@ -195,19 +261,19 @@ const slides = [
         level: "02",
         name: "Usage",
         desc: "Попробовать разные чаты. Понять, что модели отличаются. Больше контекста = лучше ответ.",
-        hours: "5–50 ч",
+        hours: "5–30 ч",
       },
       {
         level: "03",
         name: "Building",
         desc: "GPT Canvas → Google AI Studio → Cursor/Windsurf. Создание своих инструментов.",
-        hours: "50–200 ч",
+        hours: "30–100 ч",
       },
       {
         level: "04",
         name: "Engineering",
         desc: "Агенты, MCP, терминал, сложные workflow. Кросс-опыление идей.",
-        hours: "200+ ч",
+        hours: "50–200+ ч",
       },
     ],
   },
@@ -221,41 +287,12 @@ const slides = [
     title: "Lvl 1 — Awareness: Что происходит в мире",
     content: "Первые часы. Что-то знать, почитать, послушать, на какую-то дискуссию сходить. Понять, что такое агенты, агентность, как меняются компании и даже государства.",
     items: [
-      "Слова 2026: «Агенты», «Second Brain», «RAG», «Knowledge Bases» — знать, что за ними стоит",
-      "AI Slop: данные, сгенерированные другими ИИ для отравления обучающих выборок — уметь отличать",
-      "Вертикальный сдвиг: AI влияет на регуляции, рабочие места, креативные индустрии",
-      "Ваши родители, возможно, все еще на этом уровне — и это нормально",
+      "Слова 2026: «Агенты», «Second Brain», «RAG», «Knowledge Bases»",
+      "AI Slop: отравленные данные от других ИИ",
+      "Вертикальный сдвиг: регуляции, рабочие места, креативные индустрии",
+      "Ваши родители, возможно, все еще здесь — и это нормально",
     ],
     note: "Время на уровне: 0–5 часов. Цель: понять ландшафт и выбрать направление для исследования.",
-  },
-
-  {
-    id: 'awareness-resources',
-    block: 2,
-    blockTitle: "Mindset Shift",
-    type: "resources",
-    title: "Awareness: Что читать и смотреть",
-    groups: [
-      {
-        label: "EN",
-        items: [
-          { name: "AI Index Report (Stanford)", desc: "Ежегодный отчет о состоянии AI в мире" },
-          { name: "The Rundown AI", desc: "Ежедневная рассылка — 5 мин на главные новости" },
-          { name: "Lenny's Podcast", desc: "Продуктовое мышление + AI adoption" },
-          { name: "YouTube: Matt Wolfe", desc: "Еженедельный обзор новых AI-инструментов" },
-          { name: "YouTube: AI Explained", desc: "Глубокие разборы моделей и трендов" },
-        ],
-      },
-      {
-        label: "RU",
-        items: [
-          { name: "Telegram: AI Newz", desc: "Русскоязычная лента AI-новостей" },
-          { name: "YouTube: Droider", desc: "Технологические обзоры с AI-фокусом" },
-          { name: "Podcast: Zavtracast", desc: "Технологии и будущее на русском" },
-          { name: "Perplexity.ai", desc: "Вместо Google — AI-поиск с источниками" },
-        ],
-      },
-    ],
   },
 
   // --- LEVEL 2: USAGE deep-dive ---
@@ -263,32 +300,63 @@ const slides = [
     id: 'usage-deep',
     block: 2,
     blockTitle: "Mindset Shift",
-    type: "content",
-    title: "Lvl 2 — Usage: Пробуем и сравниваем",
-    content: "Попробовать разные чаты и понять, что модели — это не «всё знание человечества», а сильно отфильтрованный кусочек. У каждой компании свои safety filters, свои данные, своё понимание, как разговаривать с человеком.",
-    items: [
-      "DeepSeek — китайский, с другими культурными фильтрами и цензурой",
-      "GPT — «мейнстрим», старается быть поддерживающим, иногда слишком",
-      "Claude — глубокий, рефлексивный, лучше для длинных текстов и кода",
-      "Gemini — интегрирован с Google, хорош для поиска и мультимодальности",
-      "Perplexity — AI-поиск с цитированием источников, замена Google",
-    ],
-    note: "Время на уровне: 5–50 часов. Задайте каверзный вопрос в 3 разных чата — увидите разницу.",
+    type: "bigquote",
+    quote: "Модели — это не «всё знание человечества», а сильно отфильтрованный кусочек.",
+    note: "Lvl 2 — Usage: Пробуем и сравниваем. 5–30 часов.",
+  },
+
+  // --- LEVEL 3: CONTEXT & RAG ---
+  {
+    id: 'context-intro',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "bigquote",
+    quote: "Нам не нужен весь контекст человечества — нам нужен наш контекст.",
+    note: "Lvl 3 — Context & RAG. 30–100 часов.",
   },
 
   {
-    id: 'usage-exercise',
+    id: 'context-deep',
     block: 2,
     blockTitle: "Mindset Shift",
     type: "content",
-    title: "Упражнение: Тест на фильтры",
-    content: "Попробуйте задать одни и те же вопросы в DeepSeek, GPT и Claude. Особенно каверзные — про политику, этику, спорные темы.",
+    title: "Контекст важнее промпта",
     items: [
-      "«Что важнее: гармония в обществе или свобода слова?» — сравните ответы",
-      "«Объясни феномен X» (несуществующий) — кто начнет уверенно врать, а кто скажет «не знаю»?",
-      "Чем больше контекста даете — тем лучше ответ. Первая реакция «как тупо!» — нормальна",
-      "Синтетическая интуиция: научиться чувствовать, какая модель лучше для какой задачи",
+      "Больше деталей = лучше ответ. Это первый шаг.",
+      "Фреймворки: «Объясни через IFS», «Проанализируй через JTBD», «Примени 5 Whys»",
+      "Модели обучены на старых данных. Без интернета или RAG — могут тупить",
+      "Контекст о себе — это процесс. Он становится лучше со временем",
     ],
+  },
+
+  {
+    id: 'rag-explained',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "content",
+    title: "RAG: Retrieval-Augmented Generation",
+    content: "Patrick Lewis, Facebook AI Research, 2020",
+    items: [
+      "RAG = поиск релевантных данных + генерация ответа на их основе",
+      "Или проще: математически описать текст и сравнивать цифры (векторный поиск)",
+      "Зачем: убрать галлюцинации, дать современные данные, сузить фокус",
+    ],
+  },
+
+  // --- LEVEL 4: BUILDING & ENGINEERING ---
+  {
+    id: 'building-intro',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "content",
+    title: "Lvl 4 — Building & Engineering: Создаем инструменты",
+    content: "Когда у нас есть контекст — мы можем начать строить. Самый простой вход: Google Build.",
+    items: [
+      "Google Build — вайб-кодинг за 5 минут, без установки, просто в браузере",
+      "App Generators (Lovable, bolt.new, Replit) — прототип за выходные",
+      "IDEs (Windsurf, Cursor) — последние 20%, логика, рефакторинг, масштаб",
+    ],
+    note: "Время на уровне: 50–200+ часов. Цель: создавать свои инструменты.",
   },
 
   {
@@ -300,87 +368,101 @@ const slides = [
   },
 
   {
-    id: 15,
+    id: 'finding-ideas',
     block: 2,
     blockTitle: "Mindset Shift",
     type: "content",
-    title: "Два ключевых навыка",
+    title: "Самое сложное — найти идею",
     items: [
-      "Уметь находить идеи — замечать трения в жизни",
-      "Уметь объяснять задачи — превращать боль в спецификацию",
+      "Pain-to-Prompt: записывай голосовое, когда чувствуешь раздражение от задачи",
+      "Правило «Второго раза»: делаешь что-то второй раз — думай об автоматизации",
+      "Поиск по жалобам: «I hate when...», «Why is there no...» в сообществах",
+      "Поиск по стыкам: [твои интересы] + AI workflow",
     ],
-    note: "В этом помогают: (1) насмотренность — community, чатик, шеринг; (2) просто брать, делать и пробовать бесконечно.",
+    note: "В этом помогают: насмотренность (community, чатик, шеринг) и бесконечные пробы.",
   },
 
-  // --- CHECK-IN & VOICES (end of Mindset block) ---
+  // ═══════════════════════════════════════════
+  // LIVE DATA: Poll Results (end of Block 2)
+  // ═══════════════════════════════════════════
 
   {
-    id: 'poll-feeling',
+    id: 'poll-scale-ai',
     block: 2,
     blockTitle: "Mindset Shift",
-    type: "poll",
-    title: "Как ты себя чувствуешь?",
-    subtitle: "Zoom Poll",
-    options: [
-      { svg: "overwhelmed", label: "Overwhelmed", desc: "Слишком много всего" },
-      { svg: "excited", label: "Excited", desc: "Хочу больше" },
-      { svg: "confused", label: "Confused", desc: "Пока не понимаю, куда это все" },
-      { svg: "calm", label: "Calm", desc: "Начинаю разбираться" },
+    type: "poll-scale",
+    title: "Где вы на шкале AI?",
+    subtitle: "42 ответа · от 1 до 10",
+    labelMin: "Знаю что существует",
+    labelMax: "Не могу без AI прожить день",
+    average: "6.2",
+    distribution: [
+      { value: 1, count: 0 },
+      { value: 2, count: 1 },
+      { value: 3, count: 3 },
+      { value: 4, count: 6 },
+      { value: 5, count: 4 },
+      { value: 6, count: 7 },
+      { value: 7, count: 8 },
+      { value: 8, count: 5 },
+      { value: 9, count: 6 },
+      { value: 10, count: 2 },
     ],
-  },
-
-  {
-    id: 'poll-scale',
-    block: 2,
-    blockTitle: "Mindset Shift",
-    type: "poll",
-    title: "Где ты на шкале AI?",
-    subtitle: "1-10",
-    svg: "scale",
-    open: true,
-    scale: { min: 1, max: 10, labelMin: "Знаю что существует", labelMax: "Не могу без AI прожить день" },
+    note: "Пик на 7 — большинство уже интегрировали AI в ежедневную работу. Разброс от 2 до 10 — группа неоднородна, и это нормально.",
   },
 
   {
     id: 'poll-useful',
     block: 2,
     blockTitle: "Mindset Shift",
-    type: "poll",
+    type: "poll-wordcloud",
     title: "Что было самым полезным?",
-    subtitle: "Zoom Chat",
-    svg: "useful",
-    open: true,
-    prompt: "Одна вещь из трех недель, которая реально изменила что-то в твоей жизни или работе",
+    subtitle: "35 ответов · свободная форма",
+    maxWeight: 8,
+    words: [
+      { text: "Claude Code", weight: 8, highlight: true },
+      { text: "сообщество", weight: 7, highlight: true },
+      { text: "примеры", weight: 6 },
+      { text: "Степан", weight: 5 },
+      { text: "насмотренность", weight: 5 },
+      { text: "вайб-кодинг", weight: 4 },
+      { text: "Obsidian", weight: 4 },
+      { text: "инструменты", weight: 5 },
+      { text: "автоматизация", weight: 4 },
+      { text: "Сергей Рис", weight: 4 },
+      { text: "страх ушёл", weight: 3, highlight: true },
+      { text: "бадди-система", weight: 3 },
+      { text: "архитектура", weight: 3 },
+      { text: "голосовые", weight: 3 },
+      { text: "безопасность", weight: 2 },
+      { text: "контекст", weight: 3 },
+      { text: "цепочки", weight: 2 },
+      { text: "FOMO", weight: 2 },
+    ],
+    quotes: [
+      { text: "Прошёл страх потери контроля при использовании AI", author: "Alexander V." },
+      { text: "Попробовать своими руками Claude Code и увидеть, что я тоже могу", author: "Елена" },
+      { text: "Это лаборатория, где расширяется представление", author: "из чата" },
+    ],
+    note: "Главные темы: практические инструменты, сообщество и вдохновение от других участников.",
   },
 
   {
-    id: 'poll-done',
+    id: 'poll-progress-ai',
     block: 2,
     blockTitle: "Mindset Shift",
-    type: "poll",
-    title: "Что ты уже сделал с помощью AI?",
-    subtitle: "Zoom Poll",
-    options: [
-      { svg: "calm", label: "Пока ничего", desc: "Но собираюсь" },
-      { svg: "confused", label: "Промпты", desc: "Попробовал(а) разные модели" },
-      { svg: "useful", label: "Для работы", desc: "Создал(а) что-то полезное" },
-      { svg: "progress", label: "Свой инструмент", desc: "Построил(а) приложение или автоматизацию" },
+    type: "poll-progress",
+    title: "Что вы уже сделали за 3 недели?",
+    subtitle: "42 ответа · можно выбрать несколько",
+    total: 42,
+    stages: [
+      { level: "○", label: "Ничего конкретного", desc: "Но собираюсь", count: 4, pct: 10 },
+      { level: "◐", label: "Попробовал инструменты", desc: "Несколько моделей и сервисов", count: 15, pct: 36 },
+      { level: "◑", label: "В процессе создания", desc: "Что-то для работы или жизни", count: 19, pct: 45 },
+      { level: "●", label: "Создал для работы/жизни", desc: "Готовый результат", count: 17, pct: 40 },
+      { level: "★", label: "Построил свой инструмент", desc: "Приложение или автоматизация", count: 11, pct: 26 },
     ],
-  },
-
-  {
-    id: 'voices',
-    block: 2,
-    blockTitle: "Mindset Shift",
-    type: "voices",
-    title: "Что вы сказали",
-    subtitle: "Голоса участников",
-    items: [
-      { text: "Cursor/Windsurf не только для кода, но и для текста.", tag: "WS01" },
-      { text: "Понимание роли контекста. Я даже стал активнее слушать людей, поняв, как контекст работает.", tag: "WS02" },
-      { text: "Вернул чувство цифровой свободы. Никаких ограничений нету.", tag: "Tools" },
-      { text: "Это лаборатория, где расширяется представление. Майндсет накапливается.", tag: "WS01" },
-    ],
+    note: "90% группы уже что-то делают. 26% построили свой инструмент — к четвёртой неделе это сильный результат.",
   },
 
   // ═══════════════════════════════════════════
@@ -582,6 +664,23 @@ const slides = [
   },
 
   {
+    id: 'prd-questions',
+    block: 4,
+    blockTitle: "PRD",
+    type: "content",
+    title: "Вопросы для правильного PRD",
+    content: "Задай себе эти вопросы прежде чем писать промпт:",
+    items: [
+      "Кто пользователь? (бабушка? риэлтор? я сам?)",
+      "Какие 2-3 главных состояния? (тишина → слушаю → вывожу текст)",
+      "Что точно НЕ нужно? (Non-Goals: без БД, без авторизации, без мобильной версии)",
+      "Как выглядит успех? (бабушка видит текст на планшете = win)",
+      "Какой инструмент? (Google Build для прототипа, Cursor для серьезного)",
+    ],
+    note: "Промпт «напиши туду-менеджер для риэлторов» может дать как связку бананов, так и B2B SaaS на 300 менеджеров. Разница — в деталях.",
+  },
+
+  {
     id: 28,
     block: 4,
     blockTitle: "PRD",
@@ -613,6 +712,22 @@ const slides = [
       "Четкое описание состояний → готовая схема за секунды",
     ],
     note: "Это момент, когда стеклянный потолок исчезает.",
+  },
+
+  {
+    id: 'publishing',
+    block: 4,
+    blockTitle: "PRD",
+    type: "content",
+    title: "Паблишинг: как выложить в мир",
+    items: [
+      "GitHub Pages — бесплатный хостинг для статических сайтов (эта презентация живет там)",
+      "Netlify / Vercel — деплой в один клик из GitHub",
+      "Replit — сразу хостит то, что ты сбилдил",
+      "Lovable — встроенный деплой, даешь ссылку и все работает",
+      "Свой домен — от $10/год, подключается за 5 минут",
+    ],
+    note: "Паблишинг — это не финал. Это начало. Выложил → получил фидбек → улучшил.",
   },
 
   // ═══════════════════════════════════════════
@@ -679,6 +794,23 @@ const slides = [
   },
 
   {
+    id: 'ides-comparison',
+    block: 5,
+    blockTitle: "Vibe Coding",
+    type: "content",
+    title: "Windsurf vs Cursor: почему Windsurf сейчас прикольнее",
+    items: [
+      "Cascade Agent — понимает весь dependency graph проекта, а не файл за файлом",
+      "Instant Apply — рефакторинг 50+ файлов одним промптом",
+      "Live Preview — видишь результат прямо в IDE",
+      "Интуитивный UX для смешанных команд (не только для хардкорных девов)",
+      "Cursor: глубокий контроль, Composer mode, предсказуемая подписка",
+      "Claude Code: agentic CLI, когда визуальные билдеры достигают предела",
+    ],
+    note: "Попробуешь бесплатно, поймешь насколько сложно. Потом заплатишь 50 евро и идеи будут реализовываться в 50 раз быстрее.",
+  },
+
+  {
     id: 33,
     block: 5,
     blockTitle: "Vibe Coding",
@@ -737,6 +869,22 @@ const slides = [
       "Character reference — сохранение персонажа между генерациями",
       "Inpaint: не обязательно перегенерировать всю картинку",
     ],
+  },
+
+  {
+    id: 'nanobanano-pro',
+    block: 6,
+    blockTitle: "Creative Toolkit",
+    type: "content",
+    title: "NanoBanana Pro — прорыв 2026",
+    content: "Gemini 2.5 Flash + нативная генерация изображений. Что изменилось?",
+    items: [
+      "JSON-редактирование: описываешь изменения структурой — меняется только нужная часть картинки",
+      "Цифры и координаты: лучше всех работает с числами, временем, количеством",
+      "Сохранение персонажа: итеративное редактирование без потери идентичности",
+      "Разговорное редактирование: «убери фон», «измени выражение на улыбку» — и это работает",
+    ],
+    note: "Доступна: Fusara.ai, Google ImageFX, Google Gemini Chat",
   },
 
   {

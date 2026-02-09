@@ -13,6 +13,7 @@ const icons = {
 
 export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isSelected, style }, ref) => {
   const Icon = icons[node.type] || Box
+  const isLevel = node.isLevel
 
   const handleCardClick = (e) => {
     const target = e.target
@@ -21,6 +22,32 @@ export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isS
   }
 
   const handleInputClick = (e) => e.stopPropagation()
+
+  if (isLevel) {
+    return (
+      <div
+        ref={ref}
+        style={style}
+        onClick={handleCardClick}
+        className={`absolute w-72 flex flex-col overflow-hidden group
+          transition-all duration-500 rounded-2xl border-2
+          ${isSelected ? 'bg-slate-800 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.4)] scale-105 z-50 border-red-500/50' : 'bg-slate-900 hover:bg-slate-800 shadow-xl border-slate-700/50 z-10'}
+        `}
+      >
+        <div
+          className="h-7 w-full cursor-grab active:cursor-grabbing flex items-center justify-between px-4 border-b border-white/10"
+          onMouseDown={(e) => onDragStart(e, node.id)}
+        >
+          <div className="flex gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-red-400 opacity-70"></div></div>
+          <div className="text-[10px] font-mono uppercase font-bold text-slate-400">{node.timeEstimate}</div>
+        </div>
+        <div className="p-5">
+          <input type="text" value={node.title} onClick={handleInputClick} onChange={(e) => onUpdate(node.id, 'title', e.target.value)} className="bg-transparent w-full focus:outline-none mb-2 text-white font-sans font-extrabold text-lg tracking-tight" />
+          <textarea value={node.description} onClick={handleInputClick} onChange={(e) => onUpdate(node.id, 'description', e.target.value)} className="bg-transparent w-full resize-none focus:outline-none h-12 text-sm leading-relaxed text-slate-400 font-medium" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div
