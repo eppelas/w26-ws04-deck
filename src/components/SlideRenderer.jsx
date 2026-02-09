@@ -46,6 +46,9 @@ export default function SlideRenderer({ slide }) {
     case 'section': content = <SectionSlide s={slide} />; break;
     case 'poll': content = <PollSlide s={slide} />; break;
     case 'poll-results': content = <PollResultsSlide s={slide} />; break;
+    case 'poll-scale': content = <PollScaleSlide s={slide} />; break;
+    case 'poll-wordcloud': content = <PollWordcloudSlide s={slide} />; break;
+    case 'poll-progress': content = <PollProgressSlide s={slide} />; break;
     case 'recap': content = <RecapSlide s={slide} />; break;
     case 'voices': content = <VoicesSlide s={slide} />; break;
     case 'bigquote': content = <BigQuoteSlide s={slide} />; break;
@@ -209,6 +212,145 @@ function PollResultsSlide({ s }) {
 
       {s.note && (
         <p className="text-xs text-swiss-muted max-w-lg animate-fade-in animate-fade-in-delay-5">{s.note}</p>
+      )}
+    </div>
+  )
+}
+
+function PollScaleSlide({ s }) {
+  const maxCount = Math.max(...(s.distribution || []).map(d => d.count))
+
+  return (
+    <div className="flex flex-col items-center justify-center text-center gap-6 px-4">
+      <div>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-swiss-black tracking-tight animate-fade-in">
+          {s.title}
+        </h2>
+        <p className="text-sm text-swiss-red mt-2 font-medium animate-fade-in animate-fade-in-delay-1">{s.subtitle}</p>
+      </div>
+
+      <div className="w-full max-w-2xl animate-fade-in animate-fade-in-delay-2">
+        <div className="flex items-end justify-center gap-2 h-40">
+          {(s.distribution || []).map((d, i) => (
+            <div key={i} className="flex flex-col items-center gap-1 flex-1">
+              <span className="text-xs font-bold text-swiss-black">{d.count || ''}</span>
+              <motion.div
+                className="w-full rounded-t-md"
+                style={{ backgroundColor: d.value >= 7 ? '#DC2626' : d.value >= 4 ? '#1a1a1a' : '#9ca3af' }}
+                initial={{ height: 0 }}
+                animate={{ height: d.count > 0 ? `${(d.count / maxCount) * 120}px` : '2px' }}
+                transition={{ duration: 0.6, delay: i * 0.08, ease: 'easeOut' }}
+              />
+              <span className={`text-xs font-mono ${d.value >= 7 ? 'text-swiss-red font-bold' : 'text-swiss-muted'}`}>{d.value}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-between text-xs text-swiss-muted mt-2 px-1">
+          <span>{s.labelMin}</span>
+          <span>{s.labelMax}</span>
+        </div>
+      </div>
+
+      {s.average && (
+        <div className="animate-fade-in animate-fade-in-delay-3">
+          <span className="text-sm text-swiss-muted">Среднее: </span>
+          <span className="text-2xl font-extrabold text-swiss-red">{s.average}</span>
+          <span className="text-sm text-swiss-muted"> / 10</span>
+        </div>
+      )}
+
+      {s.note && (
+        <p className="text-xs text-swiss-muted max-w-lg animate-fade-in animate-fade-in-delay-4">{s.note}</p>
+      )}
+    </div>
+  )
+}
+
+function PollWordcloudSlide({ s }) {
+  const sizes = ['text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl']
+
+  return (
+    <div className="flex flex-col items-center justify-center text-center gap-6 px-4">
+      <div>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-swiss-black tracking-tight animate-fade-in">
+          {s.title}
+        </h2>
+        <p className="text-sm text-swiss-red mt-2 font-medium animate-fade-in animate-fade-in-delay-1">{s.subtitle}</p>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-center gap-3 max-w-2xl animate-fade-in animate-fade-in-delay-2">
+        {(s.words || []).map((w, i) => {
+          const sizeIdx = Math.min(Math.floor((w.weight / (s.maxWeight || 8)) * sizes.length), sizes.length - 1)
+          return (
+            <motion.span
+              key={i}
+              className={`${sizes[sizeIdx]} font-bold leading-tight ${w.highlight ? 'text-swiss-red' : 'text-swiss-black'}`}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: w.weight >= 3 ? 1 : 0.6, scale: 1 }}
+              transition={{ duration: 0.4, delay: i * 0.06 }}
+            >
+              {w.text}
+            </motion.span>
+          )
+        })}
+      </div>
+
+      {s.quotes && (
+        <div className="w-full max-w-xl space-y-2 mt-2">
+          {s.quotes.map((q, i) => (
+            <div key={i} className={`text-left text-xs italic text-swiss-muted border-l-2 border-swiss-red/30 pl-3 animate-fade-in animate-fade-in-delay-${Math.min(i + 3, 5)}`}>
+              "{q.text}" <span className="font-medium not-italic">— {q.author}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {s.note && (
+        <p className="text-xs text-swiss-muted max-w-lg animate-fade-in animate-fade-in-delay-5">{s.note}</p>
+      )}
+    </div>
+  )
+}
+
+function PollProgressSlide({ s }) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center gap-6 px-4">
+      <div>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-swiss-black tracking-tight animate-fade-in">
+          {s.title}
+        </h2>
+        <p className="text-sm text-swiss-red mt-2 font-medium animate-fade-in animate-fade-in-delay-1">{s.subtitle}</p>
+      </div>
+
+      <div className="w-full max-w-2xl space-y-5">
+        {(s.stages || []).map((st, i) => (
+          <div key={i} className={`animate-fade-in animate-fade-in-delay-${Math.min(i + 1, 5)}`}>
+            <div className="flex justify-between items-baseline mb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono text-swiss-red">{st.level}</span>
+                <span className="text-swiss-black font-bold text-sm">{st.label}</span>
+              </div>
+              <span className="text-swiss-muted text-xs">{st.count}/{s.total} ({st.pct}%)</span>
+            </div>
+            <div className="relative w-full h-4 bg-swiss-gray/15 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full rounded-full"
+                style={{
+                  background: st.level === '●' ? '#DC2626' :
+                    `linear-gradient(90deg, #1a1a1a ${100 - st.pct}%, #DC2626 100%)`
+                }}
+                initial={{ width: 0 }}
+                animate={{ width: `${st.pct}%` }}
+                transition={{ duration: 0.8, delay: i * 0.15, ease: 'easeOut' }}
+              />
+            </div>
+            <span className="text-swiss-muted text-xs">{st.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      {s.note && (
+        <p className="text-xs text-swiss-muted max-w-lg mt-2 animate-fade-in animate-fade-in-delay-5">{s.note}</p>
       )}
     </div>
   )
