@@ -57,66 +57,6 @@ const slides = [
   },
 
   // ═══════════════════════════════════════════
-  // BLOCK 0.5: CHECK-IN POLLS
-  // ═══════════════════════════════════════════
-
-  {
-    id: 4,
-    block: 0,
-    blockTitle: "Opening",
-    type: "poll",
-    title: "Как ты себя чувствуешь?",
-    subtitle: "Zoom Poll",
-    voxel: "/voxels/slide1-builder.html",
-    options: [
-      { svg: "overwhelmed", label: "Overwhelmed", desc: "Слишком много всего" },
-      { svg: "excited", label: "Excited", desc: "Хочу больше" },
-      { svg: "confused", label: "Confused", desc: "Пока не понимаю, куда это все" },
-      { svg: "calm", label: "Calm", desc: "Начинаю разбираться" },
-    ],
-  },
-
-  {
-    id: 5,
-    block: 0,
-    blockTitle: "Opening",
-    type: "poll",
-    title: "Где ты на шкале AI?",
-    subtitle: "1-10",
-    svg: "scale",
-    open: true,
-    scale: { min: 1, max: 10, labelMin: "Знаю что существует", labelMax: "Не могу без AI прожить день" },
-  },
-
-  {
-    id: 6,
-    block: 0,
-    blockTitle: "Opening",
-    type: "poll",
-    title: "Что было самым полезным?",
-    subtitle: "Zoom Chat",
-    svg: "useful",
-    open: true,
-    prompt: "Одна вещь из трех недель, которая реально изменила что-то в твоей жизни или работе",
-  },
-
-  {
-    id: 7,
-    block: 0,
-    blockTitle: "Opening",
-    type: "poll",
-    title: "Что ты уже сделал с помощью AI?",
-    subtitle: "Zoom Poll",
-    voxel: "/voxels/slide3-steps.html",
-    options: [
-      { svg: "calm", label: "Пока ничего", desc: "Но собираюсь" },
-      { svg: "confused", label: "Промпты", desc: "Попробовал(а) разные модели" },
-      { svg: "useful", label: "Для работы", desc: "Создал(а) что-то полезное" },
-      { svg: "progress", label: "Свой инструмент", desc: "Построил(а) приложение или автоматизацию" },
-    ],
-  },
-
-  // ═══════════════════════════════════════════
   // BLOCK 1: RECAP
   // ═══════════════════════════════════════════
 
@@ -204,21 +144,6 @@ const slides = [
       "NotebookLM — недооцененный инструмент, всеядный и с огромным контекстом",
       "Гонять черновик промпта между нейронками: GPT → Claude → Gemini → и обратно",
       "Контекст о себе — это процесс, он становится лучше со временем",
-    ],
-  },
-
-  {
-    id: 8,
-    block: 1,
-    blockTitle: "Recap",
-    type: "voices",
-    title: "Что вы сказали",
-    subtitle: "Голоса участников",
-    items: [
-      { text: "Cursor/Windsurf не только для кода, но и для текста.", tag: "WS01" },
-      { text: "Понимание роли контекста. Я даже стал активнее слушать людей, поняв, как контекст работает.", tag: "WS01" },
-      { text: "Вернул чувство цифровой свободы. Никаких ограничений нету.", tag: "Tools" },
-      { text: "Это лаборатория, где расширяется представление. Майндсет накапливается.", tag: "WS01" },
     ],
   },
 
@@ -385,6 +310,77 @@ const slides = [
       "Уметь объяснять задачи — превращать боль в спецификацию",
     ],
     note: "В этом помогают: (1) насмотренность — community, чатик, шеринг; (2) просто брать, делать и пробовать бесконечно.",
+  },
+
+  // --- CHECK-IN & VOICES (end of Mindset block) ---
+
+  {
+    id: 'poll-feeling',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "poll",
+    title: "Как ты себя чувствуешь?",
+    subtitle: "Zoom Poll",
+    options: [
+      { svg: "overwhelmed", label: "Overwhelmed", desc: "Слишком много всего" },
+      { svg: "excited", label: "Excited", desc: "Хочу больше" },
+      { svg: "confused", label: "Confused", desc: "Пока не понимаю, куда это все" },
+      { svg: "calm", label: "Calm", desc: "Начинаю разбираться" },
+    ],
+  },
+
+  {
+    id: 'poll-scale',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "poll",
+    title: "Где ты на шкале AI?",
+    subtitle: "1-10",
+    svg: "scale",
+    open: true,
+    scale: { min: 1, max: 10, labelMin: "Знаю что существует", labelMax: "Не могу без AI прожить день" },
+  },
+
+  {
+    id: 'poll-useful',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "poll",
+    title: "Что было самым полезным?",
+    subtitle: "Zoom Chat",
+    svg: "useful",
+    open: true,
+    prompt: "Одна вещь из трех недель, которая реально изменила что-то в твоей жизни или работе",
+  },
+
+  {
+    id: 'poll-done',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "poll",
+    title: "Что ты уже сделал с помощью AI?",
+    subtitle: "Zoom Poll",
+    options: [
+      { svg: "calm", label: "Пока ничего", desc: "Но собираюсь" },
+      { svg: "confused", label: "Промпты", desc: "Попробовал(а) разные модели" },
+      { svg: "useful", label: "Для работы", desc: "Создал(а) что-то полезное" },
+      { svg: "progress", label: "Свой инструмент", desc: "Построил(а) приложение или автоматизацию" },
+    ],
+  },
+
+  {
+    id: 'voices',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "voices",
+    title: "Что вы сказали",
+    subtitle: "Голоса участников",
+    items: [
+      { text: "Cursor/Windsurf не только для кода, но и для текста.", tag: "WS01" },
+      { text: "Понимание роли контекста. Я даже стал активнее слушать людей, поняв, как контекст работает.", tag: "WS02" },
+      { text: "Вернул чувство цифровой свободы. Никаких ограничений нету.", tag: "Tools" },
+      { text: "Это лаборатория, где расширяется представление. Майндсет накапливается.", tag: "WS01" },
+    ],
   },
 
   // ═══════════════════════════════════════════
