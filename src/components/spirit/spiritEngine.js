@@ -212,6 +212,17 @@ let cachedModel = buildCharacterModel(0)
 export function createSpiritEngine(canvas) {
   const ctx = canvas.getContext('2d')
   let W = 0, H = 0, dt = 0.016, time = 0, sessionTime = 0
+  // ─── RAGE GROWTH: spirit grows 8x over 5 minutes ───
+  const RAGE_DURATION = 300
+  const RAGE_MAX_SCALE = 8
+  const rageStartTime = Date.now() / 1000
+  function getRageFactor() {
+    const elapsed = Date.now() / 1000 - rageStartTime
+    if (elapsed <= 0) return 1
+    const t = Math.min(elapsed / RAGE_DURATION, 1)
+    return 1 + (RAGE_MAX_SCALE - 1) * t * t
+  }
+  function getRageSpeed() { return 1 + (getRageFactor() - 1) * 0.6 }
   let mouse = { x: -9999, y: -9999, active: false }
   let fontReady = false
   let animId = null
@@ -427,7 +438,8 @@ export function createSpiritEngine(canvas) {
 
   function newPerimeterWaypoint() {
     const m = CONFIG.perimeterMargin
-    const inner = CONFIG.perimeterInner
+    const _rage = getRageFactor()
+    const inner = Math.max(0, CONFIG.perimeterInner * (1 - (_rage - 1) / (RAGE_MAX_SCALE - 1)))
     // pick a random edge: 0=top, 1=right, 2=bottom, 3=left
     const edge = Math.floor(Math.random() * 4)
     switch (edge) {
@@ -537,7 +549,8 @@ export function createSpiritEngine(canvas) {
 
   function drawCharacter() {
     const phase = getPhaseData()
-    const vs = CONFIG.voxelSize * CONFIG.scale
+    const rage = getRageFactor()
+    const vs = CONFIG.voxelSize * CONFIG.scale * rage
 
     // rebuild model if growth changed (quantized to 0.02 steps)
     const growth = totalSlides > 1 ? slideIndex / (totalSlides - 1) : 0
@@ -566,7 +579,7 @@ export function createSpiritEngine(canvas) {
     ctx.globalAlpha = 0.06 + growth * 0.04
     ctx.fillStyle = BLACK
     ctx.beginPath()
-    ctx.ellipse(baseX, baseY + 25 + growth * 8, shadowSize, 4 + growth * 2, 0, 0, Math.PI * 2)
+    ctx.ellipse(baseX, baseY + (25 + growth * 8) * rage, shadowSize * rage, (4 + growth * 2) * rage, 0, 0, Math.PI * 2)
     ctx.fill()
     ctx.restore()
 
@@ -759,19 +772,22 @@ export function createSpiritEngine(canvas) {
         ch.vy += (dy / distMouse) * cursorForce
       } else {
         wpTimer += dt
-        if (wpTimer > 6 + Math.random() * 4 || Math.abs(ch.x - waypoint.x) < 20) {
+        const rSpd = getRageSpeed()
+        const wpInterval = Math.max(1.5, (6 + Math.random() * 4) / rSpd)
+        if (wpTimer > wpInterval || Math.abs(ch.x - waypoint.x) < 20) {
           newPerimeterWaypoint()
         }
         const wx = waypoint.x - ch.x, wy = waypoint.y - ch.y
         const wd = Math.sqrt(wx * wx + wy * wy)
-        const ws = CONFIG.wanderSpeed * energy
+        const ws = CONFIG.wanderSpeed * energy * rSpd
         if (wd > 1) { ch.vx += (wx / wd) * ws; ch.vy += (wy / wd) * ws }
       }
     }
 
     ch.vx *= CONFIG.friction; ch.vy *= CONFIG.friction
+    const rageMax = CONFIG.maxSpeed * getRageSpeed()
     const cs = Math.sqrt(ch.vx * ch.vx + ch.vy * ch.vy)
-    if (cs > CONFIG.maxSpeed) { ch.vx = (ch.vx / cs) * CONFIG.maxSpeed; ch.vy = (ch.vy / cs) * CONFIG.maxSpeed }
+    if (cs > rageMax) { ch.vx = (ch.vx / cs) * rageMax; ch.vy = (ch.vy / cs) * rageMax }
     if (!ch.sleeping) ch.vy += CONFIG.gravity
     ch.x += ch.vx; ch.y += ch.vy
 
