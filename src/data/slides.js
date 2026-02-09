@@ -383,6 +383,89 @@ const slides = [
   },
 
   // ═══════════════════════════════════════════
+  // LIVE DATA: Poll Results (end of Block 2)
+  // ═══════════════════════════════════════════
+
+  {
+    id: 'poll-scale-ai',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "poll-scale",
+    title: "Где вы на шкале AI?",
+    subtitle: "42 ответа · от 1 до 10",
+    labelMin: "Знаю что существует",
+    labelMax: "Не могу без AI прожить день",
+    average: "6.2",
+    distribution: [
+      { value: 1, count: 0 },
+      { value: 2, count: 1 },
+      { value: 3, count: 3 },
+      { value: 4, count: 6 },
+      { value: 5, count: 4 },
+      { value: 6, count: 7 },
+      { value: 7, count: 8 },
+      { value: 8, count: 5 },
+      { value: 9, count: 6 },
+      { value: 10, count: 2 },
+    ],
+    note: "Пик на 7 — большинство уже интегрировали AI в ежедневную работу. Разброс от 2 до 10 — группа неоднородна, и это нормально.",
+  },
+
+  {
+    id: 'poll-useful',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "poll-wordcloud",
+    title: "Что было самым полезным?",
+    subtitle: "35 ответов · свободная форма",
+    maxWeight: 8,
+    words: [
+      { text: "Claude Code", weight: 8, highlight: true },
+      { text: "сообщество", weight: 7, highlight: true },
+      { text: "примеры", weight: 6 },
+      { text: "Степан", weight: 5 },
+      { text: "насмотренность", weight: 5 },
+      { text: "вайб-кодинг", weight: 4 },
+      { text: "Obsidian", weight: 4 },
+      { text: "инструменты", weight: 5 },
+      { text: "автоматизация", weight: 4 },
+      { text: "Сергей Рис", weight: 4 },
+      { text: "страх ушёл", weight: 3, highlight: true },
+      { text: "бадди-система", weight: 3 },
+      { text: "архитектура", weight: 3 },
+      { text: "голосовые", weight: 3 },
+      { text: "безопасность", weight: 2 },
+      { text: "контекст", weight: 3 },
+      { text: "цепочки", weight: 2 },
+      { text: "FOMO", weight: 2 },
+    ],
+    quotes: [
+      { text: "Прошёл страх потери контроля при использовании AI", author: "Alexander V." },
+      { text: "Попробовать своими руками Claude Code и увидеть, что я тоже могу", author: "Елена" },
+      { text: "Это лаборатория, где расширяется представление", author: "из чата" },
+    ],
+    note: "Главные темы: практические инструменты, сообщество и вдохновение от других участников.",
+  },
+
+  {
+    id: 'poll-progress-ai',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "poll-progress",
+    title: "Что вы уже сделали за 3 недели?",
+    subtitle: "42 ответа · можно выбрать несколько",
+    total: 42,
+    stages: [
+      { level: "○", label: "Ничего конкретного", desc: "Но собираюсь", count: 4, pct: 10 },
+      { level: "◐", label: "Попробовал инструменты", desc: "Несколько моделей и сервисов", count: 15, pct: 36 },
+      { level: "◑", label: "В процессе создания", desc: "Что-то для работы или жизни", count: 19, pct: 45 },
+      { level: "●", label: "Создал для работы/жизни", desc: "Готовый результат", count: 17, pct: 40 },
+      { level: "★", label: "Построил свой инструмент", desc: "Приложение или автоматизация", count: 11, pct: 26 },
+    ],
+    note: "90% группы уже что-то делают. 26% построили свой инструмент — к четвёртой неделе это сильный результат.",
+  },
+
+  // ═══════════════════════════════════════════
   // BLOCK 3: FRICTION AUDITING
   // ═══════════════════════════════════════════
 
