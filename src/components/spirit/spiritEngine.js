@@ -363,22 +363,36 @@ export function createSpiritEngine(canvas) {
     bubble.charReveal = Math.min(bubble.text.length, bubble.charReveal + 12 * dt)
   }
 
+  function wrapText(ctx, text, maxW) {
+    const words = text.split(' ')
+    const lines = []; let line = ''
+    for (const w of words) {
+      const test = line ? line + ' ' + w : w
+      if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w }
+      else line = test
+    }
+    if (line) lines.push(line)
+    return lines
+  }
+
   function drawBubble(x, y) {
     if (bubble.opacity <= 0.01 || !fontReady) return
     ctx.save()
     ctx.font = `${CONFIG.bubbleFontWeight} ${CONFIG.bubbleFontSize}px "IBM Plex Mono", monospace`
     const displayText = bubble.text.slice(0, Math.floor(bubble.charReveal))
-    const fullWidth = ctx.measureText(bubble.text).width
+    const maxLineW = Math.min(280, W * 0.35)
+    const lines = wrapText(ctx, displayText, maxLineW)
+    const lineH = CONFIG.bubbleFontSize + 3
     const pad = 9
-    const bw = fullWidth + pad * 2
-    const bh = CONFIG.bubbleFontSize + pad * 2 - 2
+    const bw = Math.min(maxLineW + pad * 2, lines.reduce((m, l) => Math.max(m, ctx.measureText(l).width), 0) + pad * 2)
+    const bh = lineH * lines.length + pad * 2 - 2
     let bx = Math.max(6, Math.min(W - bw - 6, x - bw / 2))
-    let by = Math.max(6, y - 50 + bubble.slideY)
+    let by = Math.max(6, y - 50 - (lines.length - 1) * lineH + bubble.slideY)
     ctx.globalAlpha = bubble.opacity * 0.95
 
     // shadow
     ctx.fillStyle = 'rgba(0,0,0,0.15)'
-    ctx.fillRect(bx + 2, by + 2, bw, bh) // square shadow for voxel feel
+    ctx.fillRect(bx + 2, by + 2, bw, bh)
     // bg
     ctx.fillStyle = CONFIG.bubbleBackground
     ctx.fillRect(bx, by, bw, bh)
@@ -388,7 +402,7 @@ export function createSpiritEngine(canvas) {
     // text
     ctx.textBaseline = 'middle'
     ctx.fillStyle = CONFIG.bubbleText
-    ctx.fillText(displayText, bx + pad, by + bh / 2 + 0.5)
+    lines.forEach((l, i) => ctx.fillText(l, bx + pad, by + pad + lineH * i + lineH / 2))
     ctx.restore()
   }
 
@@ -865,7 +879,7 @@ export function createSpiritEngine(canvas) {
         say(pick(PHRASES.manyClicks), 3.5)
         ch.vx += (ch.x - e.clientX) * 0.08; ch.vy += (ch.y - e.clientY) * 0.08
       } else {
-        say(pick(PHRASES.click))
+        say(pick(PHRASES.click), 5)
         ch.vx += (dx < 0 ? 1 : -1) * CONFIG.clickPushForce; ch.vy -= CONFIG.clickPushForce * 0.5
       }
     } else {
