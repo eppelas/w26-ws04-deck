@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import VoxelScene from './VoxelScene'
 import { POLL_METAPHORS } from './PollMetaphors'
 
@@ -44,6 +45,7 @@ export default function SlideRenderer({ slide }) {
     case 'timeline': content = <TimelineSlide s={slide} />; break;
     case 'section': content = <SectionSlide s={slide} />; break;
     case 'poll': content = <PollSlide s={slide} />; break;
+    case 'poll-results': content = <PollResultsSlide s={slide} />; break;
     case 'recap': content = <RecapSlide s={slide} />; break;
     case 'voices': content = <VoicesSlide s={slide} />; break;
     case 'bigquote': content = <BigQuoteSlide s={slide} />; break;
@@ -160,6 +162,53 @@ function PollSlide({ s }) {
             <p className="text-swiss-muted text-sm italic">{s.prompt}</p>
           </div>
         </div>
+      )}
+    </div>
+  )
+}
+
+function PollResultsSlide({ s }) {
+  const sorted = [...(s.results || [])].sort((a, b) => b.pct - a.pct)
+  const maxPct = sorted.length ? sorted[0].pct : 100
+
+  return (
+    <div className="flex flex-col items-center justify-center text-center gap-8 px-4">
+      <div>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-swiss-black tracking-tight animate-fade-in">
+          {s.title}
+        </h2>
+        <p className="text-sm text-swiss-red mt-2 font-medium animate-fade-in animate-fade-in-delay-1">{s.subtitle}</p>
+      </div>
+
+      <div className="w-full max-w-2xl space-y-4">
+        {sorted.map((r, i) => {
+          const OptSvg = r.svg ? POLL_METAPHORS[r.svg] : null
+          return (
+            <div key={i} className={`flex items-center gap-4 animate-fade-in animate-fade-in-delay-${Math.min(i + 1, 5)}`}>
+              {OptSvg && <div className="w-10 h-10 flex-shrink-0"><OptSvg /></div>}
+              <div className="flex-1 text-left">
+                <div className="flex justify-between items-baseline mb-1">
+                  <span className="text-swiss-black font-bold text-sm">{r.label}</span>
+                  <span className="text-swiss-muted text-xs">{r.count}/{s.total} ({r.pct}%)</span>
+                </div>
+                <div className="w-full h-3 bg-swiss-gray/20 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: r.pct === maxPct ? '#DC2626' : '#1a1a1a' }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${r.pct}%` }}
+                    transition={{ duration: 0.8, delay: i * 0.15, ease: 'easeOut' }}
+                  />
+                </div>
+                <span className="text-swiss-muted text-xs">{r.desc}</span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {s.note && (
+        <p className="text-xs text-swiss-muted max-w-lg animate-fade-in animate-fade-in-delay-5">{s.note}</p>
       )}
     </div>
   )
