@@ -3,9 +3,17 @@ import slides from './data/slides'
 import SlideRenderer from './components/SlideRenderer'
 import ProgressBar from './components/ProgressBar'
 import BlockNav from './components/BlockNav'
+import DMapPage from './components/DMapPage'
+import InteractionMap from './components/layers/InteractionMap'
 
 export default function App() {
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(() => {
+    const saved = localStorage.getItem('ws04_slide')
+    const idx = saved ? parseInt(saved, 10) : 0
+    return idx >= 0 && idx < slides.length ? idx : 0
+  })
+  const [showDMap, setShowDMap] = useState(false)
+  const [showLayers, setShowLayers] = useState(false)
   const total = slides.length
 
   const go = useCallback((dir) => {
@@ -20,6 +28,10 @@ export default function App() {
   const goTo = useCallback((idx) => {
     if (idx >= 0 && idx < total) setCurrent(idx)
   }, [total])
+
+  useEffect(() => {
+    localStorage.setItem('ws04_slide', String(current))
+  }, [current])
 
   useEffect(() => {
     const onKey = (e) => {
@@ -58,11 +70,19 @@ export default function App() {
   const blockTitles = {}
   slides.forEach(s => { blockTitles[s.block] = s.blockTitle })
 
-  return (
-    <div className="h-screen w-screen flex flex-col bg-white overflow-hidden select-none">
-      <ProgressBar current={current} total={total} slide={slide} />
+  if (showLayers) {
+    return <InteractionMap onBack={() => setShowLayers(false)} />
+  }
 
-      <main className="flex-1 overflow-hidden flex items-center justify-center px-6 md:px-16 lg:px-24">
+  if (showDMap) {
+    return <DMapPage onBack={() => setShowDMap(false)} />
+  }
+
+  return (
+    <div className="h-screen w-screen flex flex-col bg-white overflow-hidden">
+      <ProgressBar current={current} total={total} slide={slide} onLayersClick={() => setShowLayers(true)} />
+
+      <main className="flex-1 overflow-visible flex items-center justify-center px-6 md:px-16 lg:px-24">
         <div key={slide.id} className="w-full max-w-5xl animate-fade-in">
           <SlideRenderer slide={slide} />
         </div>
@@ -77,6 +97,7 @@ export default function App() {
           goTo={goTo}
         />
         <div className="flex items-center gap-4">
+          <button onClick={() => setShowDMap(true)} className="hover:text-swiss-red transition-colors px-2 py-1 border border-swiss-gray/40 rounded hover:border-swiss-red/40">D-Map</button>
           <button onClick={() => go(-1)} className="hover:text-swiss-black transition-colors px-2 py-1">&larr;</button>
           <span className="text-swiss-muted tabular-nums">{current + 1}/{total}</span>
           <button onClick={() => go(1)} className="hover:text-swiss-black transition-colors px-2 py-1">&rarr;</button>

@@ -28,72 +28,154 @@ const mutedMat = mat(MUTED)
 function buildScene1_Builder() {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(0xFFFFFF)
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
-  camera.position.set(12, 10, 16)
-  camera.lookAt(0, 3, 0)
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 500)
+  camera.position.set(0, 28, 50)
+  camera.lookAt(0, 6, 0)
 
   const vGeo = new THREE.BoxGeometry(1, 1, 1)
-  const figure = new THREE.Group()
+  const island = new THREE.Group()
 
-  function addV(x, y, z, m = blackMat) {
-    const mesh = new THREE.Mesh(vGeo, m); mesh.position.set(x, y, z); mesh.castShadow = true; figure.add(mesh)
+  // 3-color palette: dark, red, light
+  const darkMat = mat(0x222222)
+  const lightMat = mat(0xD4D4D4)
+  const accentMat = mat(RED, true)
+  const waterMat = new THREE.MeshStandardMaterial({color:0xD4D4D4, transparent:true, opacity:0.5, roughness:0.1})
+
+  // Island terrain — floating cone shape
+  const R = 10
+  for(let x=-R;x<=R;x++) for(let z=-R;z<=R;z++){
+    const d = Math.sqrt(x*x + z*z)
+    if(d > R-1) continue
+    const surfH = Math.floor(Math.sin(x*0.3)*Math.cos(z*0.3)*1.5)
+    const isRiver = x>=1 && x<=3 && z>-2
+    if(!isRiver){
+      const m = new THREE.Mesh(vGeo, lightMat)
+      m.position.set(x, surfH, z); m.castShadow=true; island.add(m)
+    }
+    const depth = Math.max(2, Math.floor((R-d)*0.9) + Math.floor(Math.sin(x*0.5+z*0.3)*2))
+    for(let y=1;y<=depth;y++){
+      const m = new THREE.Mesh(vGeo, darkMat)
+      m.position.set(x, surfH-y, z); island.add(m)
+    }
+    if(isRiver){
+      const m = new THREE.Mesh(vGeo, darkMat)
+      m.position.set(x, surfH-1, z); island.add(m)
+    }
   }
-  addV(-0.5,0,0); addV(-0.5,1,0); addV(0.5,0,0); addV(0.5,1,0)
-  addV(0,2,0); addV(0,3,0); addV(0,4,0); addV(-1,4,0); addV(1,4,0)
-  addV(-1,3,0); addV(-1,2,0.5); addV(1,3,0); addV(1,2,0.5)
-  addV(0,5,0); addV(0,6,0, redMat)
-  scene.add(figure)
 
-  const blockPositions = [
-    {target:new THREE.Vector3(3,0,2),delay:0},{target:new THREE.Vector3(4,0,2),delay:0.5},
-    {target:new THREE.Vector3(3,1,2),delay:1},{target:new THREE.Vector3(4,1,2),delay:1.5},
-    {target:new THREE.Vector3(3,2,2),delay:2},{target:new THREE.Vector3(4,2,2),delay:2.5},
-    {target:new THREE.Vector3(3,0,3),delay:0.3},{target:new THREE.Vector3(4,0,3),delay:0.8},
-    {target:new THREE.Vector3(3,1,3),delay:1.3},{target:new THREE.Vector3(4,1,3),delay:1.8},
-    {target:new THREE.Vector3(3.5,3,2.5),delay:3},
-    {target:new THREE.Vector3(-3,0,-1),delay:0.2},{target:new THREE.Vector3(-3,1,-1),delay:0.7},
-    {target:new THREE.Vector3(-3,0,0),delay:1.1},{target:new THREE.Vector3(-3,1,0),delay:1.6},
-    {target:new THREE.Vector3(-3,2,-0.5),delay:2.2},
+  // Tree — dark trunk + red canopy
+  const treeX=-3, treeZ=-3, treeH=12
+  for(let y=0;y<treeH;y++){
+    const offX = Math.sin(y*0.3)*1.5
+    const offZ = Math.cos(y*0.25)*1
+    const thick = y<3 ? 2 : (y<6 ? 1 : 0)
+    for(let tx=-thick;tx<=thick;tx++) for(let tz=-thick;tz<=thick;tz++){
+      if(tx*tx+tz*tz > thick*thick+0.5) continue
+      const m = new THREE.Mesh(vGeo, darkMat)
+      m.position.set(treeX+offX+tx, y+1, treeZ+offZ+tz); m.castShadow=true; island.add(m)
+    }
+    if(y>5 && y%3===0){
+      const bLen = 3+Math.random()*3
+      const dx=(Math.random()-0.5), dz=(Math.random()-0.5)
+      for(let b=1;b<bLen;b++){
+        const m = new THREE.Mesh(vGeo, darkMat)
+        m.position.set(treeX+offX+dx*b*2, y+1+b*0.5, treeZ+offZ+dz*b*2); island.add(m)
+      }
+    }
+  }
+  // Canopy — red
+  const canopies = [
+    {cx:treeX, cy:treeH+2, cz:treeZ, r:5},
+    {cx:treeX+3, cy:treeH, cz:treeZ+2, r:4},
+    {cx:treeX-3, cy:treeH+1, cz:treeZ-2, r:4},
+    {cx:treeX+1, cy:treeH+4, cz:treeZ-3, r:3},
   ]
-  const floatingBlocks = []
-  blockPositions.forEach(bp => {
-    const m = bp.target.y > 2 ? redMat : (Math.random() > 0.7 ? mutedMat : grayMat)
-    const mesh = new THREE.Mesh(vGeo, m)
-    mesh.castShadow = true
-    mesh.position.set(bp.target.x+(Math.random()-0.5)*8, bp.target.y+15+Math.random()*10, bp.target.z+(Math.random()-0.5)*8)
-    scene.add(mesh)
-    floatingBlocks.push({mesh, target:bp.target, delay:bp.delay, arrived:false, speed:0.02+Math.random()*0.01})
+  canopies.forEach(sp => {
+    for(let x=-sp.r;x<=sp.r;x++) for(let y=-sp.r;y<=sp.r;y++) for(let z=-sp.r;z<=sp.r;z++){
+      if(x*x+y*y+z*z > sp.r*sp.r) continue
+      if(Math.random()<0.4) continue
+      const m = new THREE.Mesh(vGeo, accentMat)
+      m.position.set(sp.cx+x, sp.cy+y, sp.cz+z); m.castShadow=true; island.add(m)
+    }
   })
 
-  const pGeo = new THREE.BoxGeometry(0.15,0.15,0.15)
-  const particles = []
-  for(let i=0;i<40;i++){
-    const p = new THREE.Mesh(pGeo, redMat)
-    p.position.set((Math.random()-0.5)*12, Math.random()*12, (Math.random()-0.5)*12)
-    scene.add(p)
-    particles.push({mesh:p, vy:0.01+Math.random()*0.02, vx:(Math.random()-0.5)*0.01})
+  // Floating rocks beneath
+  const floatRocks = [{x:8,y:-6,z:5,s:2},{x:-9,y:-4,z:3,s:1.5},{x:3,y:-10,z:-6,s:2.5}]
+  floatRocks.forEach(rock => {
+    for(let x=-rock.s;x<=rock.s;x++) for(let y=-rock.s;y<=rock.s;y++) for(let z=-rock.s;z<=rock.s;z++){
+      if(x*x+y*y+z*z > rock.s*rock.s+Math.random()) continue
+      const m = new THREE.Mesh(vGeo, darkMat)
+      m.position.set(rock.x+x, rock.y+y, rock.z+z); island.add(m)
+    }
+  })
+
+  scene.add(island)
+
+  // Water particles (river + waterfall) — light color
+  const waterGeo = new THREE.BoxGeometry(0.6, 0.6, 0.6)
+  const waterParticles = []
+  for(let i=0;i<80;i++){
+    const m = new THREE.Mesh(waterGeo, waterMat)
+    scene.add(m)
+    waterParticles.push({
+      mesh:m, x:1+Math.random()*2, y:0.3, z:-R+Math.random()*(R*2),
+      speed:0.06+Math.random()*0.04, state:'river'
+    })
+  }
+
+  // Falling particles — red
+  const leafGeo = new THREE.BoxGeometry(0.2,0.2,0.2)
+  const leafParticles = []
+  for(let i=0;i<60;i++){
+    const m = new THREE.Mesh(leafGeo, accentMat)
+    scene.add(m)
+    leafParticles.push({
+      mesh:m, x:(Math.random()-0.5)*25, y:8+Math.random()*15, z:(Math.random()-0.5)*25,
+      vy:0.03+Math.random()*0.03, vx:(Math.random()-0.5)*0.03, vz:(Math.random()-0.5)*0.03
+    })
   }
 
   addLights(scene)
 
-  let angle = 0
+  let angle = 0, lastT = 0
   return { scene, camera, animate(t) {
-    angle += 0.0006
-    camera.position.x = Math.cos(angle)*18; camera.position.z = Math.sin(angle)*18
-    camera.position.y = 10+Math.sin(t*0.06); camera.lookAt(0,3,0)
-    floatingBlocks.forEach(b => {
-      if(t<b.delay) return
-      if(b.arrived){b.mesh.position.y=b.target.y+Math.sin(t*0.4+b.delay)*0.03; return}
-      const dir = new THREE.Vector3().subVectors(b.target, b.mesh.position)
-      const dist = dir.length()
-      if(dist<0.1){b.mesh.position.copy(b.target);b.arrived=true}
-      else{dir.normalize().multiplyScalar(Math.min(b.speed*0.2*(1+t*0.06),dist));b.mesh.position.add(dir)}
+    const dt = t - lastT; lastT = t
+    const ease = t < 3 ? 0 : Math.min((t - 3) / 5, 1)
+    angle += dt * 0.12 * ease
+    camera.position.x = Math.sin(angle) * 46
+    camera.position.z = Math.cos(angle) * 46
+    camera.position.y = 28 + Math.sin(t * 0.3) * 1; camera.lookAt(0, 6, 0)
+
+    // Island float
+    island.position.y = Math.sin(t * 0.4) * 0.5
+
+    // Water: river flow + waterfall
+    waterParticles.forEach(wp => {
+      if(wp.state==='river'){
+        wp.z += wp.speed
+        wp.mesh.position.set(wp.x, 0.3+Math.sin(t*3+wp.z)*0.08, wp.z)
+        wp.mesh.position.add(island.position)
+        if(wp.z > R-2){ wp.state='falling'; wp.fy=0 }
+      } else {
+        wp.fy += 0.015
+        wp.mesh.position.set(wp.x, 0.3-wp.fy*wp.fy*2, wp.z+wp.fy*0.3)
+        wp.mesh.position.add(island.position)
+        wp.mesh.scale.y = 1+wp.fy*0.5
+        if(wp.mesh.position.y < -20){
+          wp.state='river'; wp.z=-R+Math.random()*3; wp.x=1+Math.random()*2; wp.fy=0
+          wp.mesh.scale.y=1
+        }
+      }
     })
-    figure.position.y = Math.sin(t*0.3)*0.1
-    particles.forEach(p => {
-      p.mesh.position.y+=p.vy*0.2; p.mesh.position.x+=p.vx*0.2
-      p.mesh.rotation.x+=0.004; p.mesh.rotation.z+=0.002
-      if(p.mesh.position.y>14){p.mesh.position.y=-1;p.mesh.position.x=(Math.random()-0.5)*12;p.mesh.position.z=(Math.random()-0.5)*12}
+
+    // Falling leaves
+    leafParticles.forEach(lp => {
+      lp.y -= lp.vy
+      lp.x += lp.vx + Math.sin(t+lp.y)*0.01
+      lp.z += lp.vz + Math.cos(t*0.7+lp.y)*0.01
+      lp.mesh.position.set(lp.x, lp.y, lp.z)
+      lp.mesh.rotation.x += 0.01; lp.mesh.rotation.z += 0.008
+      if(lp.y < -15){ lp.y=15+Math.random()*10; lp.x=(Math.random()-0.5)*25; lp.z=(Math.random()-0.5)*25 }
     })
   }}
 }
@@ -101,46 +183,100 @@ function buildScene1_Builder() {
 function buildScene2_Compass() {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(0xFFFFFF)
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
-  camera.position.set(0, 14, 18); camera.lookAt(0, 0, 0)
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 500)
+  camera.position.set(0, 22, 38)
+  camera.lookAt(0, 4, 0)
 
   const vGeo = new THREE.BoxGeometry(1, 1, 1)
-  const compass = new THREE.Group()
+  const island = new THREE.Group()
 
-  for(let x=-1;x<=1;x++) for(let z=-1;z<=1;z++){
-    const m=new THREE.Mesh(vGeo,redMat);m.position.set(x,0,z);m.castShadow=true;compass.add(m)
+  // 3-color palette: dark, cream, red
+  const darkMat = mat(0x222222)
+  const creamMat = mat(0xE8DCC8)
+  const accentMat = mat(RED, true)
+
+  // Circular island terrain
+  const R = 9
+  for(let x=-R;x<=R;x++) for(let z=-R;z<=R;z++){
+    const d = Math.sqrt(x*x+z*z)
+    if(d > R) continue
+    const surfH = Math.floor(Math.sin(x*0.25)*Math.cos(z*0.25)*1.5)
+    const m = new THREE.Mesh(vGeo, creamMat)
+    m.position.set(x, surfH, z); m.castShadow=true; island.add(m)
+    const depth = Math.max(2, Math.floor((R-d)*0.7)+Math.floor(Math.sin(x*0.4)*2))
+    for(let y=1;y<=depth;y++){
+      const mb = new THREE.Mesh(vGeo, darkMat); mb.position.set(x, surfH-y, z); island.add(mb)
+    }
   }
-  const m2=new THREE.Mesh(vGeo,redMat);m2.position.set(0,1,0);compass.add(m2)
 
-  const dirs=[{dx:1,dz:0},{dx:-1,dz:0},{dx:0,dz:1},{dx:0,dz:-1},{dx:1,dz:1},{dx:-1,dz:-1},{dx:1,dz:-1},{dx:-1,dz:1}]
-  const lens=[6,6,6,6,4,4,4,4]
-  dirs.forEach((dir,idx)=>{
-    const len=lens[idx]; const isCard=idx<4
-    for(let i=2;i<=len;i++){
-      const mt=(i===len)?redMat:(isCard?blackMat:grayMat)
-      const m=new THREE.Mesh(vGeo,mt);m.position.set(dir.dx*i,0,dir.dz*i);m.castShadow=true;compass.add(m)
-      if(i===len){const tip=new THREE.Mesh(vGeo,redMat);tip.position.set(dir.dx*i,1,dir.dz*i);compass.add(tip)}
+  // Lighthouse tower in center
+  for(let y=0;y<12;y++){
+    const thick = y<3 ? 2 : (y<8 ? 1 : 0)
+    const tMat = y>=8 ? accentMat : darkMat
+    for(let tx=-thick;tx<=thick;tx++) for(let tz=-thick;tz<=thick;tz++){
+      if(tx*tx+tz*tz > thick*thick+0.5) continue
+      const m = new THREE.Mesh(vGeo, tMat)
+      m.position.set(tx, y+1, tz); m.castShadow=true; island.add(m)
+    }
+  }
+  const beacon = new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,1.5), accentMat)
+  beacon.position.set(0, 13, 0); island.add(beacon)
+
+  // Direction markers at path ends (N/S/E/W)
+  const dirs = [{dx:0,dz:R-1},{dx:0,dz:-(R-1)},{dx:R-1,dz:0},{dx:-(R-1),dz:0}]
+  dirs.forEach(d => {
+    for(let y=0;y<3;y++){
+      const m = new THREE.Mesh(vGeo, y===2 ? accentMat : darkMat)
+      m.position.set(d.dx, y+1, d.dz); m.castShadow=true; island.add(m)
     }
   })
-  scene.add(compass)
 
+  // Trees along edges — dark trunk, cream crown
+  const treeSpots = [{x:-5,z:-5},{x:5,z:-4},{x:-4,z:5},{x:6,z:4},{x:-7,z:0},{x:0,z:-7}]
+  treeSpots.forEach(ts => {
+    if(Math.sqrt(ts.x*ts.x+ts.z*ts.z)>R-1) return
+    for(let y=0;y<2;y++){const m=new THREE.Mesh(vGeo,darkMat);m.position.set(ts.x,y+1,ts.z);m.castShadow=true;island.add(m)}
+    for(let dx=-1;dx<=1;dx++) for(let dz=-1;dz<=1;dz++) for(let dy=0;dy<2;dy++){
+      if(dy===1&&(Math.abs(dx)+Math.abs(dz))>1) continue
+      const m=new THREE.Mesh(vGeo,creamMat);m.position.set(ts.x+dx,3+dy,ts.z+dz);m.castShadow=true;island.add(m)
+    }
+  })
+
+  // Floating rocks
+  const rocks=[{x:12,y:-4,z:3,s:2},{x:-11,y:-3,z:-4,s:1.5},{x:4,y:-8,z:-9,s:2}]
+  rocks.forEach(r=>{
+    for(let x=-r.s;x<=r.s;x++) for(let y=-r.s;y<=r.s;y++) for(let z=-r.s;z<=r.s;z++){
+      if(x*x+y*y+z*z>r.s*r.s+Math.random()) continue
+      const m=new THREE.Mesh(vGeo,darkMat);m.position.set(r.x+x,r.y+y,r.z+z);island.add(m)
+    }
+  })
+
+  scene.add(island)
+
+  // Orbiting particles — red
   const orbiters=[]
-  for(let i=0;i<8;i++){
-    const angle=(i/8)*Math.PI*2; const radius=9+Math.random()*2; const height=2+Math.random()*3
-    const m=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.4,0.4), i%3===0?redMat:mat(0x999999))
+  for(let i=0;i<15;i++){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.3,0.3), accentMat)
     scene.add(m)
-    orbiters.push({mesh:m,angle,radius,height,speed:0.3+Math.random()*0.3})
+    orbiters.push({mesh:m,angle:(i/15)*Math.PI*2,radius:3+Math.random()*2,height:10+Math.random()*5,speed:0.4+Math.random()*0.3})
   }
 
   addLights(scene)
 
+  let camAngle=0, lastT2=0
   return { scene, camera, animate(t) {
-    compass.rotation.y=t*0.03; compass.position.y=Math.sin(t*0.16)*0.3
+    const dt=t-lastT2; lastT2=t
+    const ease=t<3?0:Math.min((t-3)/5,1)
+    camAngle+=dt*0.12*ease
+    camera.position.x=Math.sin(camAngle)*34
+    camera.position.z=Math.cos(camAngle)*34
+    camera.position.y=22+Math.sin(t*0.3)*1; camera.lookAt(0,4,0)
+    island.position.y=Math.sin(t*0.4)*0.4
+    beacon.scale.setScalar(1+Math.sin(t*3)*0.15)
     orbiters.forEach(o=>{
-      o.angle+=o.speed*0.002
-      o.mesh.position.x=Math.cos(o.angle)*o.radius; o.mesh.position.z=Math.sin(o.angle)*o.radius
-      o.mesh.position.y=o.height+Math.sin(t*0.3+o.angle)*0.5
-      o.mesh.rotation.x+=0.004; o.mesh.rotation.y+=0.006
+      o.angle+=o.speed*0.008
+      o.mesh.position.set(Math.cos(o.angle)*o.radius, o.height+Math.sin(t*0.5+o.angle)*1+island.position.y, Math.sin(o.angle)*o.radius)
+      o.mesh.rotation.x+=0.01; o.mesh.rotation.z+=0.008
     })
   }}
 }
@@ -148,53 +284,114 @@ function buildScene2_Compass() {
 function buildScene3_Steps() {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(0xFFFFFF)
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
-  camera.position.set(16, 12, 20); camera.lookAt(0, 3, 0)
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 500)
+  camera.position.set(0, 24, 42)
+  camera.lookAt(0, 6, 0)
 
   const vGeo = new THREE.BoxGeometry(1, 1, 1)
-  const platforms=[
-    {x:-8,h:2,w:3,d:3,color:MUTED,label:'done'},{x:-4,h:4,w:3,d:3,color:MUTED,label:'done'},
-    {x:0,h:6,w:3,d:3,color:MUTED,label:'done'},{x:4,h:8,w:3,d:3,color:RED,label:'active'},
-    {x:8,h:10,w:3,d:3,color:GRAY,label:'upcoming'},
+  const island = new THREE.Group()
+
+  // 3-color palette: dark, white, red
+  const darkMat = mat(0x222222)
+  const whiteMat = mat(0xF0F0F0)
+  const accentMat = mat(RED, true)
+
+  // Terraced mountain island — 4 levels stepping up
+  const levels = [
+    {y:0, r:10, m:whiteMat},
+    {y:4, r:7, m:whiteMat},
+    {y:8, r:5, m:darkMat},
+    {y:12, r:3, m:whiteMat},
   ]
-  const platformGroups=[]
-  platforms.forEach(p=>{
-    const group=new THREE.Group(); const isActive=p.label==='active'; const isUpcoming=p.label==='upcoming'
-    for(let x=0;x<p.w;x++) for(let z=0;z<p.d;z++) for(let y=0;y<p.h;y++){
-      const isShell=x===0||x===p.w-1||z===0||z===p.d-1||y===0||y===p.h-1
-      if(!isShell&&!isActive) continue
-      if(isUpcoming){
-        const edges=new THREE.EdgesGeometry(vGeo)
-        const line=new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:GRAY,transparent:true,opacity:0.4}))
-        line.position.set(p.x+x,y,z);group.add(line)
-      } else {
-        let color=p.color; if(isActive&&y===p.h-1) color=RED; else if(isActive) color=(y%2===0)?BLACK:0x2A2A2A
-        const mt=new THREE.MeshStandardMaterial({color,roughness:isActive?0.4:0.8,metalness:isActive?0.2:0.05})
-        const m=new THREE.Mesh(vGeo,mt);m.position.set(p.x+x,y,z);m.castShadow=true;group.add(m)
+  levels.forEach((lv,li) => {
+    for(let x=-lv.r;x<=lv.r;x++) for(let z=-lv.r;z<=lv.r;z++){
+      const d=Math.sqrt(x*x+z*z)
+      if(d>lv.r) continue
+      const surfH=lv.y+Math.floor(Math.sin(x*0.3)*Math.cos(z*0.3))
+      const m=new THREE.Mesh(vGeo,lv.m)
+      m.position.set(x,surfH,z);m.castShadow=true;island.add(m)
+      if(li===0){
+        const depth=Math.max(2,Math.floor((lv.r-d)*0.8))
+        for(let y=1;y<=depth;y++){
+          const mb=new THREE.Mesh(vGeo,darkMat);mb.position.set(x,surfH-y,z);island.add(mb)
+        }
+      }
+      if(li>0 && d>lv.r-1.5){
+        for(let wy=levels[li-1].y;wy<lv.y;wy++){
+          const wm=new THREE.Mesh(vGeo,darkMat)
+          wm.position.set(x,wy,z);island.add(wm)
+        }
       }
     }
-    scene.add(group); platformGroups.push({group,config:p})
   })
 
-  const activeP=platforms[3]; const pGeo=new THREE.BoxGeometry(0.2,0.2,0.2)
-  const particles=[]
-  for(let i=0;i<30;i++){
-    const m=new THREE.Mesh(pGeo,new THREE.MeshStandardMaterial({color:RED,roughness:0.3}))
-    m.position.set(activeP.x+1+(Math.random()-0.5)*3, activeP.h+Math.random()*5, 1+(Math.random()-0.5)*3)
-    scene.add(m); particles.push({mesh:m,vy:0.015+Math.random()*0.02,baseY:activeP.h})
+  // Red flag at summit
+  for(let y=0;y<4;y++){
+    const m=new THREE.Mesh(vGeo,y<3?darkMat:accentMat)
+    m.position.set(0,13+y,0);m.castShadow=true;island.add(m)
+  }
+  for(let fx=1;fx<=3;fx++){
+    const m=new THREE.Mesh(vGeo,accentMat)
+    m.position.set(fx,16,0);island.add(m)
+  }
+
+  // Staircase path spiraling up
+  for(let i=0;i<60;i++){
+    const angle=i*0.15
+    const r=10-i*0.12
+    const y=i*0.22
+    if(r<1) break
+    const sx=Math.cos(angle)*r, sz=Math.sin(angle)*r
+    const m=new THREE.Mesh(vGeo,i>45?accentMat:darkMat)
+    m.position.set(Math.round(sx),Math.floor(y),Math.round(sz));m.castShadow=true;island.add(m)
+  }
+
+  // Trees — dark trunk, white crown
+  const treeSpots=[{x:-6,z:-4},{x:5,z:-6},{x:-7,z:3},{x:7,z:2},{x:-3,z:7},{x:4,z:6}]
+  treeSpots.forEach(ts=>{
+    for(let y=0;y<2;y++){const m=new THREE.Mesh(vGeo,darkMat);m.position.set(ts.x,y+1,ts.z);m.castShadow=true;island.add(m)}
+    for(let dx=-1;dx<=1;dx++) for(let dz=-1;dz<=1;dz++){
+      if(Math.abs(dx)+Math.abs(dz)>1 && Math.random()>0.5) continue
+      for(let dy=0;dy<2;dy++){
+        const m=new THREE.Mesh(vGeo,whiteMat);m.position.set(ts.x+dx,3+dy,ts.z+dz);m.castShadow=true;island.add(m)
+      }
+    }
+  })
+
+  // Floating rocks
+  const rocks=[{x:12,y:-5,z:4,s:2},{x:-10,y:-3,z:-6,s:1.5},{x:5,y:-9,z:-8,s:2.5}]
+  rocks.forEach(r=>{
+    for(let x=-r.s;x<=r.s;x++) for(let y=-r.s;y<=r.s;y++) for(let z=-r.s;z<=r.s;z++){
+      if(x*x+y*y+z*z>r.s*r.s+Math.random()) continue
+      const m=new THREE.Mesh(vGeo,darkMat);m.position.set(r.x+x,r.y+y,r.z+z);island.add(m)
+    }
+  })
+
+  scene.add(island)
+
+  // Rising particles from summit — red
+  const sumParts=[]
+  for(let i=0;i<25;i++){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.2,0.2),accentMat)
+    scene.add(m)
+    sumParts.push({mesh:m,x:(Math.random()-0.5)*4,z:(Math.random()-0.5)*4,y:14+Math.random()*6,vy:0.02+Math.random()*0.02})
   }
 
   addLights(scene)
 
-  let camAngle=0.3
+  let camAngle=0,lastT3=0
   return { scene, camera, animate(t) {
-    camAngle+=0.0004
-    camera.position.x=Math.cos(camAngle)*22; camera.position.z=Math.sin(camAngle)*22
-    camera.position.y=12+Math.sin(t*0.06); camera.lookAt(0,4,0)
-    platformGroups[3].group.position.y=Math.sin(t*0.4)*0.15
-    particles.forEach(p=>{
-      p.mesh.position.y+=p.vy*0.2; p.mesh.rotation.x+=0.006; p.mesh.rotation.z+=0.004
-      if(p.mesh.position.y>p.baseY+8){p.mesh.position.y=p.baseY;p.mesh.position.x=activeP.x+1+(Math.random()-0.5)*3;p.mesh.position.z=1+(Math.random()-0.5)*3}
+    const dt=t-lastT3;lastT3=t
+    const ease=t<3?0:Math.min((t-3)/5,1)
+    camAngle+=dt*0.1*ease
+    camera.position.x=Math.sin(camAngle)*36
+    camera.position.z=Math.cos(camAngle)*36
+    camera.position.y=24+Math.sin(t*0.3)*1;camera.lookAt(0,6,0)
+    island.position.y=Math.sin(t*0.35)*0.4
+    sumParts.forEach(sp=>{
+      sp.y+=sp.vy;sp.mesh.position.set(sp.x+Math.sin(t+sp.y)*0.3,sp.y+island.position.y,sp.z+Math.cos(t*0.7+sp.y)*0.3)
+      sp.mesh.rotation.x+=0.01;sp.mesh.rotation.z+=0.008
+      if(sp.y>25){sp.y=14;sp.x=(Math.random()-0.5)*4;sp.z=(Math.random()-0.5)*4}
     })
   }}
 }
@@ -202,56 +399,116 @@ function buildScene3_Steps() {
 function buildScene4_Archive() {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(0xFFFFFF)
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
-  camera.position.set(0, 8, 18); camera.lookAt(0, 2, 0)
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 500)
+  camera.position.set(0, 22, 38)
+  camera.lookAt(0, 4, 0)
 
   const vGeo = new THREE.BoxGeometry(1, 1, 1)
-  const archive = new THREE.Group()
+  const island = new THREE.Group()
 
-  for(let x=-4;x<=-1;x++) for(let y=0;y<5;y++){
-    const isEdge=x===-4||y===0||y===4
-    archive.add(Object.assign(new THREE.Mesh(vGeo,isEdge?blackMat:grayMat),{position:new THREE.Vector3(x,y,0),castShadow:true}))
-  }
-  for(let x=1;x<=4;x++) for(let y=0;y<5;y++){
-    const isEdge=x===4||y===0||y===4
-    archive.add(Object.assign(new THREE.Mesh(vGeo,isEdge?blackMat:grayMat),{position:new THREE.Vector3(x,y,0),castShadow:true}))
-  }
-  for(let y=0;y<5;y++) archive.add(Object.assign(new THREE.Mesh(vGeo,redMat),{position:new THREE.Vector3(0,y,0),castShadow:true}))
+  // 3-color palette: dark, amber, red
+  const darkMat = mat(0x222222)
+  const amberMat = mat(0xD4A574)
+  const accentMat = mat(RED, true)
 
-  const lineGeo=new THREE.BoxGeometry(0.3,0.15,0.15); const lineMat2=mat(RED,true)
-  for(let row=1;row<=3;row++) for(let col=0;col<3;col++){
-    archive.add(Object.assign(new THREE.Mesh(lineGeo,lineMat2),{position:new THREE.Vector3(-3+col*0.8,row,0.55)}))
-    archive.add(Object.assign(new THREE.Mesh(lineGeo,lineMat2),{position:new THREE.Vector3(2+col*0.8,row,0.55)}))
+  // Island terrain
+  const R = 9
+  for(let x=-R;x<=R;x++) for(let z=-R;z<=R;z++){
+    const d=Math.sqrt(x*x+z*z)
+    if(d>R) continue
+    const surfH=Math.floor(Math.sin(x*0.3)*Math.cos(z*0.3)*1)
+    const m=new THREE.Mesh(vGeo,amberMat)
+    m.position.set(x,surfH,z);m.castShadow=true;island.add(m)
+    const depth=Math.max(2,Math.floor((R-d)*0.8)+Math.floor(Math.sin(x*0.5)*1.5))
+    for(let y=1;y<=depth;y++){
+      const mb=new THREE.Mesh(vGeo,darkMat);mb.position.set(x,surfH-y,z);island.add(mb)
+    }
   }
-  archive.position.y=2; scene.add(archive)
 
-  const memGeo=new THREE.BoxGeometry(0.25,0.25,0.25); const memColors=[RED,BLACK,MUTED,GRAY]
+  // Central archive tower
+  for(let y=0;y<10;y++){
+    const thick=y<2?3:(y<6?2:1)
+    for(let tx=-thick;tx<=thick;tx++) for(let tz=-thick;tz<=thick;tz++){
+      if(tx*tx+tz*tz>thick*thick+0.5) continue
+      const m=new THREE.Mesh(vGeo,darkMat)
+      m.position.set(tx,y+1,tz);m.castShadow=true;island.add(m)
+    }
+  }
+  // Dome top — red
+  for(let dx=-2;dx<=2;dx++) for(let dz=-2;dz<=2;dz++){
+    if(dx*dx+dz*dz>4) continue
+    const dy=dx*dx+dz*dz<2?2:1
+    const m=new THREE.Mesh(vGeo,accentMat)
+    m.position.set(dx,10+dy,dz);m.castShadow=true;island.add(m)
+  }
+
+  // Bookshelves — 4 wings, amber shelves with red books
+  const wings=[{dx:1,dz:0},{dx:-1,dz:0},{dx:0,dz:1},{dx:0,dz:-1}]
+  wings.forEach(w=>{
+    for(let i=3;i<=7;i++){
+      for(let y=1;y<=4;y++){
+        const m=new THREE.Mesh(vGeo,amberMat)
+        m.position.set(w.dx*i,y,w.dz*i);m.castShadow=true;island.add(m)
+        if(y<4){
+          const bk=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.6,0.8),Math.random()>0.5?accentMat:darkMat)
+          bk.position.set(w.dx*i+(w.dz!==0?(Math.random()-0.5)*0.3:0),y+0.5,w.dz*i+(w.dx!==0?(Math.random()-0.5)*0.3:0))
+          island.add(bk)
+        }
+      }
+    }
+  })
+
+  // Trees — dark trunk, amber crown
+  const treeSpots=[{x:-6,z:-5},{x:6,z:-4},{x:-5,z:6},{x:7,z:3}]
+  treeSpots.forEach(ts=>{
+    for(let y=0;y<2;y++){const m=new THREE.Mesh(vGeo,darkMat);m.position.set(ts.x,y+1,ts.z);m.castShadow=true;island.add(m)}
+    for(let dx=-1;dx<=1;dx++) for(let dz=-1;dz<=1;dz++) for(let dy=0;dy<2;dy++){
+      if(dy===1&&(Math.abs(dx)+Math.abs(dz))>1) continue
+      const m=new THREE.Mesh(vGeo,amberMat);m.position.set(ts.x+dx,3+dy,ts.z+dz);m.castShadow=true;island.add(m)
+    }
+  })
+
+  // Floating rocks
+  const rocks=[{x:11,y:-5,z:4,s:2},{x:-10,y:-3,z:-5,s:1.5},{x:3,y:-9,z:-8,s:2}]
+  rocks.forEach(r=>{
+    for(let x=-r.s;x<=r.s;x++) for(let y=-r.s;y<=r.s;y++) for(let z=-r.s;z<=r.s;z++){
+      if(x*x+y*y+z*z>r.s*r.s+Math.random()) continue
+      const m=new THREE.Mesh(vGeo,darkMat);m.position.set(r.x+x,r.y+y,r.z+z);island.add(m)
+    }
+  })
+
+  scene.add(island)
+
+  // Memory particles — red, spiraling up
+  const memGeo=new THREE.BoxGeometry(0.25,0.25,0.25)
   const memories=[]
-  for(let i=0;i<50;i++){
-    const col=memColors[Math.floor(Math.random()*memColors.length)]
-    const mt=new THREE.MeshStandardMaterial({color:col,roughness:0.5,transparent:true,opacity:0.8})
+  for(let i=0;i<60;i++){
+    const mt=new THREE.MeshStandardMaterial({color:RED,emissive:RED,emissiveIntensity:0.3,transparent:true,opacity:0.8,roughness:0.3})
     const m=new THREE.Mesh(memGeo,mt)
-    const angle=Math.random()*Math.PI*2; const radius=1+Math.random()*2
-    m.position.set(Math.cos(angle)*radius, 2+Math.random()*3, Math.sin(angle)*radius)
     scene.add(m)
-    memories.push({mesh:m,angle,radius:radius+Math.random()*4,vy:0.005+Math.random()*0.015,vAngle:0.005+Math.random()*0.01,maxY:10+Math.random()*5,startY:2+Math.random()*2})
+    memories.push({mesh:m,angle:Math.random()*Math.PI*2,radius:1+Math.random()*3,y:2+Math.random()*8,vy:0.015+Math.random()*0.01,vAngle:0.01+Math.random()*0.01,maxY:18})
   }
 
   addLights(scene)
 
-  let camAngle=0
+  let camAngle=0,lastT4=0
   return { scene, camera, animate(t) {
-    camAngle+=0.0006
-    camera.position.x=Math.cos(camAngle)*16; camera.position.z=Math.sin(camAngle)*16
-    camera.position.y=8+Math.sin(t*0.08); camera.lookAt(0,3,0)
-    archive.rotation.y=Math.sin(t*0.06)*0.3; archive.position.y=2+Math.sin(t*0.16)*0.3
+    const dt=t-lastT4;lastT4=t
+    const ease=t<3?0:Math.min((t-3)/5,1)
+    camAngle+=dt*0.1*ease
+    camera.position.x=Math.sin(camAngle)*34
+    camera.position.z=Math.cos(camAngle)*34
+    camera.position.y=22+Math.sin(t*0.3)*1;camera.lookAt(0,4,0)
+    island.position.y=Math.sin(t*0.4)*0.4
     memories.forEach(m=>{
-      m.angle+=m.vAngle*0.2
-      m.mesh.position.x=Math.cos(m.angle)*m.radius; m.mesh.position.z=Math.sin(m.angle)*m.radius
-      m.mesh.position.y+=m.vy*0.2; m.mesh.rotation.x+=0.004; m.mesh.rotation.z+=0.003
-      const progress=(m.mesh.position.y-m.startY)/(m.maxY-m.startY)
-      m.mesh.material.opacity=Math.max(0,1-progress)
-      if(m.mesh.position.y>m.maxY){m.mesh.position.y=m.startY;m.radius=1+Math.random()*2;m.mesh.material.opacity=0.8}
+      m.angle+=m.vAngle
+      m.y+=m.vy
+      m.radius+=0.003
+      m.mesh.position.set(Math.cos(m.angle)*m.radius, m.y+island.position.y, Math.sin(m.angle)*m.radius)
+      m.mesh.rotation.x+=0.008;m.mesh.rotation.z+=0.006
+      const prog=(m.y-2)/(m.maxY-2)
+      m.mesh.material.opacity=Math.max(0,1-prog)
+      if(m.y>m.maxY){m.y=2;m.radius=1+Math.random()*2;m.angle=Math.random()*Math.PI*2;m.mesh.material.opacity=0.8}
     })
   }}
 }
@@ -259,70 +516,170 @@ function buildScene4_Archive() {
 function buildScene9_Mindshift() {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(0xFFFFFF)
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
-  camera.position.set(0, 12, 28); camera.lookAt(0, 4, 0)
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 500)
+  camera.position.set(0, 22, 42)
+  camera.lookAt(0, 4, 0)
 
-  const PALETTE = {
-    coral:0xFF6B6B, amber:0xFFB347, gold:0xFFD93D, mint:0x6BCB77, teal:0x4ECDC4,
-    sky:0x45B7D1, indigo:0x6C5CE7, violet:0xA55EEA, rose:0xFD79A8, warm:0xFAB1A0, sand:0xF8E9A1
-  }
-  const palKeys = Object.keys(PALETTE)
   const vGeo = new THREE.BoxGeometry(1, 1, 1)
-  const islands = []
+  const world = new THREE.Group()
 
-  function createIsland(cx,cy,cz,radius,colorA,colorB){
-    const group=new THREE.Group(); const matA=mat(colorA,true); const matB=mat(colorB); const darkMat=mat(0x5C4033)
-    for(let x=-radius;x<=radius;x++) for(let z=-radius;z<=radius;z++){
-      if(Math.sqrt(x*x+z*z)>radius) continue
-      const surfaceY=Math.floor(Math.sin(x*0.5)*Math.cos(z*0.5)*1.5)
-      group.add(Object.assign(new THREE.Mesh(vGeo,Math.random()>0.4?matA:matB),{position:new THREE.Vector3(x,surfaceY,z),castShadow:true}))
-      const depth=Math.max(1,Math.floor((radius-Math.sqrt(x*x+z*z))*0.8))
-      for(let y=1;y<=depth;y++) group.add(Object.assign(new THREE.Mesh(vGeo,darkMat),{position:new THREE.Vector3(x,surfaceY-y,z)}))
+  // 3-color palette: gray (old), red (bridge/energy), teal (new)
+  const grayMat9 = mat(0x888888)
+  const accentMat = mat(RED, true)
+  const tealMat = mat(0x4ECDC4, true)
+
+  // --- OLD ISLAND (left, gray) ---
+  function buildIsland(group, cx, R, surfMat, underMat, withTree) {
+    for(let x=-R;x<=R;x++) for(let z=-R;z<=R;z++){
+      const d = Math.sqrt(x*x+z*z)
+      if(d > R-0.5) continue
+      const surfH = Math.floor(Math.sin(x*0.4)*Math.cos(z*0.4)*1)
+      const m = new THREE.Mesh(vGeo, surfMat)
+      m.position.set(cx+x, surfH, z); m.castShadow=true; group.add(m)
+      const depth = Math.max(2, Math.floor((R-d)*0.8) + Math.floor(Math.sin(x*0.5)*1.5))
+      for(let y=1;y<=depth;y++){
+        const mb = new THREE.Mesh(vGeo, underMat)
+        mb.position.set(cx+x, surfH-y, z); group.add(mb)
+      }
     }
-    const structs=2+Math.floor(Math.random()*3)
-    for(let i=0;i<structs;i++){
-      const sx=Math.round((Math.random()-0.5)*radius*1.2); const sz=Math.round((Math.random()-0.5)*radius*1.2)
-      const sh=2+Math.floor(Math.random()*4); const sMat=mat(Math.random()>0.5?colorA:colorB,true)
-      for(let y=0;y<sh;y++) group.add(Object.assign(new THREE.Mesh(vGeo,sMat),{position:new THREE.Vector3(sx,y+1,sz),castShadow:true}))
-      const crownMat=mat(PALETTE[palKeys[Math.floor(Math.random()*palKeys.length)]],true)
-      for(let dx=-1;dx<=1;dx++) for(let dz=-1;dz<=1;dz++) if(Math.random()>0.4)
-        group.add(Object.assign(new THREE.Mesh(vGeo,crownMat),{position:new THREE.Vector3(sx+dx,sh+1,sz+dz),castShadow:true}))
+    if(withTree){
+      for(let y=0;y<6;y++){
+        const m = new THREE.Mesh(vGeo, grayMat9)
+        m.position.set(cx, y+1, 0); m.castShadow=true; group.add(m)
+      }
+      for(let b of [{dx:1,dy:5,dz:0},{dx:-1,dy:4,dz:1},{dx:0,dy:6,dz:-1}]){
+        for(let i=1;i<=2;i++){
+          const m = new THREE.Mesh(vGeo, grayMat9)
+          m.position.set(cx+b.dx*i, b.dy+i*0.5, b.dz*i); group.add(m)
+        }
+      }
     }
-    group.position.set(cx,cy,cz); scene.add(group)
-    islands.push({group,baseY:cy,speed:0.1+Math.random()*0.1,phase:Math.random()*Math.PI*2})
   }
 
-  createIsland(0,0,0,5,PALETTE.mint,PALETTE.teal)
-  createIsland(-10,2,-4,3,PALETTE.coral,PALETTE.rose)
-  createIsland(9,-1,3,3,PALETTE.gold,PALETTE.amber)
-  createIsland(3,6,-8,2,PALETTE.sky,PALETTE.indigo)
-  createIsland(-6,4,6,2,PALETTE.violet,PALETTE.warm)
+  buildIsland(world, -10, 6, grayMat9, grayMat9, true)
 
-  const particles=[]
-  for(let i=0;i<60;i++){
-    const col=PALETTE[palKeys[Math.floor(Math.random()*palKeys.length)]]
-    const size=0.15+Math.random()*0.2; const pMat=mat(col,true)
-    const m=new THREE.Mesh(new THREE.BoxGeometry(size,size,size),pMat)
-    m.position.set((Math.random()-0.5)*30, Math.random()*15-3, (Math.random()-0.5)*25)
+  // --- NEW ISLAND (right, teal) ---
+  buildIsland(world, 10, 7, tealMat, grayMat9, false)
+
+  // Living tree on new island — gray trunk, teal canopy
+  const tX=10, tZ=0, tH=10
+  for(let y=0;y<tH;y++){
+    const offX = Math.sin(y*0.35)*1.2
+    const offZ = Math.cos(y*0.3)*0.8
+    const thick = y<3 ? 2 : (y<5 ? 1 : 0)
+    for(let tx=-thick;tx<=thick;tx++) for(let tz=-thick;tz<=thick;tz++){
+      if(tx*tx+tz*tz > thick*thick+0.5) continue
+      const m = new THREE.Mesh(vGeo, grayMat9)
+      m.position.set(tX+offX+tx, y+1, tZ+offZ+tz); m.castShadow=true; world.add(m)
+    }
+    if(y>4 && y%2===0){
+      const bLen=2+Math.random()*3, dx=(Math.random()-0.5), dz=(Math.random()-0.5)
+      for(let b=1;b<bLen;b++){
+        const m = new THREE.Mesh(vGeo, grayMat9)
+        m.position.set(tX+offX+dx*b*2, y+1+b*0.4, tZ+offZ+dz*b*2); world.add(m)
+      }
+    }
+  }
+  // Canopy — teal
+  const canopies = [
+    {cx:tX, cy:tH+2, cz:tZ, r:4},
+    {cx:tX+3, cy:tH, cz:tZ+2, r:3},
+    {cx:tX-2, cy:tH+1, cz:tZ-2, r:3},
+  ]
+  canopies.forEach(sp => {
+    for(let x=-sp.r;x<=sp.r;x++) for(let y=-sp.r;y<=sp.r;y++) for(let z=-sp.r;z<=sp.r;z++){
+      if(x*x+y*y+z*z > sp.r*sp.r) continue
+      if(Math.random()<0.35) continue
+      const m = new THREE.Mesh(vGeo, tealMat)
+      m.position.set(sp.cx+x, sp.cy+y, sp.cz+z); m.castShadow=true; world.add(m)
+    }
+  })
+
+  // --- BRIDGE (red energy) ---
+  for(let i=0;i<14;i++){
+    const t2 = i/13
+    const bx = -4 + t2*18
+    const by = 1 + Math.sin(t2*Math.PI)*3
+    const m = new THREE.Mesh(vGeo, accentMat)
+    m.position.set(bx, by, 0); m.castShadow=true; world.add(m)
+    if(i%2===0){
+      const r1 = new THREE.Mesh(new THREE.BoxGeometry(0.4,1,0.4), accentMat)
+      r1.position.set(bx, by+1, -1); world.add(r1)
+      const r2 = new THREE.Mesh(new THREE.BoxGeometry(0.4,1,0.4), accentMat)
+      r2.position.set(bx, by+1, 1); world.add(r2)
+    }
+  }
+
+  // Floating rocks — gray
+  const rocks = [{x:-14,y:-5,z:4,s:2},{x:16,y:-4,z:-3,s:1.5},{x:0,y:-8,z:5,s:2}]
+  rocks.forEach(rock => {
+    for(let x=-rock.s;x<=rock.s;x++) for(let y=-rock.s;y<=rock.s;y++) for(let z=-rock.s;z<=rock.s;z++){
+      if(x*x+y*y+z*z > rock.s*rock.s+Math.random()) continue
+      const m = new THREE.Mesh(vGeo, grayMat9)
+      m.position.set(rock.x+x, rock.y+y, rock.z+z); world.add(m)
+    }
+  })
+
+  scene.add(world)
+
+  // Energy stream particles — red
+  const streamGeo = new THREE.BoxGeometry(0.4, 0.4, 0.4)
+  const streamParticles = []
+  for(let i=0;i<40;i++){
+    const m = new THREE.Mesh(streamGeo, new THREE.MeshStandardMaterial({
+      color: RED, emissive: RED, emissiveIntensity:0.3,
+      transparent:true, opacity:0.8, roughness:0.2
+    }))
     scene.add(m)
-    particles.push({mesh:m,vy:0.002+Math.random()*0.004,vx:(Math.random()-0.5)*0.003,vz:(Math.random()-0.5)*0.003,rotSpeed:(Math.random()-0.5)*0.01})
+    streamParticles.push({mesh:m, prog:Math.random(), speed:0.008+Math.random()*0.006})
+  }
+
+  // Falling particles — teal
+  const leafGeo = new THREE.BoxGeometry(0.2,0.2,0.2)
+  const leafParts = []
+  for(let i=0;i<40;i++){
+    const m = new THREE.Mesh(leafGeo, tealMat)
+    scene.add(m)
+    leafParts.push({
+      mesh:m, x:10+(Math.random()-0.5)*15, y:6+Math.random()*12, z:(Math.random()-0.5)*15,
+      vy:0.025+Math.random()*0.025, vx:(Math.random()-0.5)*0.02
+    })
   }
 
   addLights(scene)
-  scene.add(new THREE.PointLight(PALETTE.coral,0.4,30).translateX(-8).translateY(5))
-  scene.add(new THREE.PointLight(PALETTE.sky,0.3,30).translateX(8).translateY(3).translateZ(-5))
+  const pLight1 = new THREE.PointLight(RED, 0.5, 25)
+  pLight1.position.set(0, 5, 0); scene.add(pLight1)
 
-  let camAngle=0
+  let camAngle=0, lastT9=0
   return { scene, camera, animate(t) {
-    camAngle+=0.0004
-    camera.position.x=Math.cos(camAngle)*26; camera.position.z=Math.sin(camAngle)*26
-    camera.position.y=12+Math.sin(t*0.05)*2; camera.lookAt(0,3,0)
-    islands.forEach(isl=>{isl.group.position.y=isl.baseY+Math.sin(t*isl.speed+isl.phase)*0.4})
-    particles.forEach(p=>{
-      p.mesh.position.y+=p.vy; p.mesh.position.x+=p.vx; p.mesh.position.z+=p.vz
-      p.mesh.rotation.x+=p.rotSpeed; p.mesh.rotation.z+=p.rotSpeed*0.7
-      if(p.mesh.position.y>14){p.mesh.position.y=-3;p.mesh.position.x=(Math.random()-0.5)*30;p.mesh.position.z=(Math.random()-0.5)*25}
+    const dt=t-lastT9; lastT9=t
+    const ease=t<3?0:Math.min((t-3)/5,1)
+    camAngle+=dt*0.1*ease
+    camera.position.x = Math.sin(camAngle) * 38
+    camera.position.z = Math.cos(camAngle) * 38
+    camera.position.y=22+Math.sin(t*0.3)*1; camera.lookAt(0,4,0)
+
+    world.position.y = Math.sin(t*0.35)*0.4
+
+    streamParticles.forEach(sp => {
+      sp.prog += sp.speed
+      if(sp.prog > 1) sp.prog -= 1
+      const px = -10 + sp.prog * 20
+      const py = 1 + Math.sin(sp.prog * Math.PI) * 4 + Math.sin(t*3+sp.prog*10)*0.3
+      sp.mesh.position.set(px, py + world.position.y, 0)
+      sp.mesh.rotation.x += 0.02; sp.mesh.rotation.z += 0.015
+      sp.mesh.material.opacity = 0.4 + Math.sin(sp.prog*Math.PI)*0.5
     })
+
+    leafParts.forEach(lp => {
+      lp.y -= lp.vy
+      lp.x += lp.vx + Math.sin(t+lp.y)*0.008
+      lp.mesh.position.set(lp.x, lp.y + world.position.y, lp.z)
+      lp.mesh.rotation.x += 0.008; lp.mesh.rotation.z += 0.006
+      if(lp.y < -12){ lp.y=12+Math.random()*8; lp.x=10+(Math.random()-0.5)*15; lp.z=(Math.random()-0.5)*15 }
+    })
+
+    pLight1.intensity = 0.3 + Math.sin(t*2)*0.2
   }}
 }
 
@@ -360,7 +717,9 @@ export default function VoxelScene({ src, className, style }) {
     if (!builder || !containerRef.current) return
 
     const container = containerRef.current
-    const { scene, camera, animate } = builder()
+    let built
+    try { built = builder() } catch(e) { console.error('VoxelScene build error:', e); return }
+    const { scene, camera, animate } = built
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))

@@ -57,11 +57,71 @@ const slides = [
   },
 
   // ═══════════════════════════════════════════
-  // BLOCK 1: RECAP
+  // BLOCK 0.5: CHECK-IN POLLS
   // ═══════════════════════════════════════════
 
   {
     id: 4,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Как ты себя чувствуешь?",
+    subtitle: "Zoom Poll",
+    voxel: "/voxels/slide1-builder.html",
+    options: [
+      { svg: "overwhelmed", label: "Overwhelmed", desc: "Слишком много всего" },
+      { svg: "excited", label: "Excited", desc: "Хочу больше" },
+      { svg: "confused", label: "Confused", desc: "Пока не понимаю, куда это все" },
+      { svg: "calm", label: "Calm", desc: "Начинаю разбираться" },
+    ],
+  },
+
+  {
+    id: 5,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Где ты на шкале AI?",
+    subtitle: "1-10",
+    svg: "scale",
+    open: true,
+    scale: { min: 1, max: 10, labelMin: "Знаю что существует", labelMax: "Не могу без AI прожить день" },
+  },
+
+  {
+    id: 6,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Что было самым полезным?",
+    subtitle: "Zoom Chat",
+    svg: "useful",
+    open: true,
+    prompt: "Одна вещь из трех недель, которая реально изменила что-то в твоей жизни или работе",
+  },
+
+  {
+    id: 7,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Что ты уже сделал с помощью AI?",
+    subtitle: "Zoom Poll",
+    voxel: "/voxels/slide3-steps.html",
+    options: [
+      { svg: "calm", label: "Пока ничего", desc: "Но собираюсь" },
+      { svg: "confused", label: "Промпты", desc: "Попробовал(а) разные модели" },
+      { svg: "useful", label: "Для работы", desc: "Создал(а) что-то полезное" },
+      { svg: "progress", label: "Свой инструмент", desc: "Построил(а) приложение или автоматизацию" },
+    ],
+  },
+
+  // ═══════════════════════════════════════════
+  // BLOCK 1: RECAP
+  // ═══════════════════════════════════════════
+
+  {
+    id: 9,
     block: 1,
     blockTitle: "Recap",
     type: "section",
@@ -130,7 +190,6 @@ const slides = [
     items: [
       { text: "Cursor/Windsurf не только для кода, но и для текста.", tag: "WS01" },
       { text: "Понимание роли контекста. Я даже стал активнее слушать людей, поняв, как контекст работает.", tag: "WS01" },
-      { text: "Способность представить ситуацию не фактологически, а чувственно.", tag: "Creative" },
       { text: "Вернул чувство цифровой свободы. Никаких ограничений нету.", tag: "Tools" },
       { text: "Это лаборатория, где расширяется представление. Майндсет накапливается.", tag: "WS01" },
     ],
@@ -159,17 +218,12 @@ const slides = [
   },
 
   {
-    id: 11,
+    id: 'cognitive-process',
     block: 2,
     blockTitle: "Mindset Shift",
-    type: "content",
-    title: "AI Mindset — это переключение",
-    content: "Мы, услышав проблему или найдя идею, практически сразу переключаем голову на искусственный интеллект. На то, каким образом с его помощью можно решить эту проблему.",
-    items: [
-      "Это НЕ «с каждым вопросом идти в ChatGPT»",
-      "Это находить переплетения в жизни, которые можно автоматизировать, навайбкодить, улучшить",
-      "Создавая инструменты под себя с помощью AI — переходишь на следующий уровень",
-    ],
+    type: "bigquote",
+    quote: "Наша задача — превратить AI из внешнего инструмента в часть когнитивного процесса.",
+    note: "Чтобы «переключить голову», нужно создать автоматизм, где любая «боль» становится входным сигналом для системы.",
   },
 
   {
@@ -206,18 +260,82 @@ const slides = [
     ],
   },
 
+  // --- LEVEL 1: AWARENESS deep-dive ---
   {
-    id: 13,
+    id: 'awareness-deep',
     block: 2,
     blockTitle: "Mindset Shift",
     type: "content",
-    title: "Разные модели = разные мировоззрения",
-    content: "У разных компаний разные safety filters, разные данные, разное понимание того, как разговаривать с человеком.",
+    title: "Lvl 1 — Awareness: Что происходит в мире",
+    content: "Первые часы. Что-то знать, почитать, послушать, на какую-то дискуссию сходить. Понять, что такое агенты, агентность, как меняются компании и даже государства.",
     items: [
-      "DeepSeek, GPT, Claude — попробуйте одни и те же каверзные вопросы",
-      "Это больше не касание всего знания человечества — а сильно отфильтрованный кусочек",
-      "Классный навык: чувствовать детерминированность каждой модели",
-      "Если хочется увидеть картину шире — смотри с разных сторон",
+      "Слова 2026: «Агенты», «Second Brain», «RAG», «Knowledge Bases» — знать, что за ними стоит",
+      "AI Slop: данные, сгенерированные другими ИИ для отравления обучающих выборок — уметь отличать",
+      "Вертикальный сдвиг: AI влияет на регуляции, рабочие места, креативные индустрии",
+      "Ваши родители, возможно, все еще на этом уровне — и это нормально",
+    ],
+    note: "Время на уровне: 0–5 часов. Цель: понять ландшафт и выбрать направление для исследования.",
+  },
+
+  {
+    id: 'awareness-resources',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "resources",
+    title: "Awareness: Что читать и смотреть",
+    groups: [
+      {
+        label: "EN",
+        items: [
+          { name: "AI Index Report (Stanford)", desc: "Ежегодный отчет о состоянии AI в мире" },
+          { name: "The Rundown AI", desc: "Ежедневная рассылка — 5 мин на главные новости" },
+          { name: "Lenny's Podcast", desc: "Продуктовое мышление + AI adoption" },
+          { name: "YouTube: Matt Wolfe", desc: "Еженедельный обзор новых AI-инструментов" },
+          { name: "YouTube: AI Explained", desc: "Глубокие разборы моделей и трендов" },
+        ],
+      },
+      {
+        label: "RU",
+        items: [
+          { name: "Telegram: AI Newz", desc: "Русскоязычная лента AI-новостей" },
+          { name: "YouTube: Droider", desc: "Технологические обзоры с AI-фокусом" },
+          { name: "Podcast: Zavtracast", desc: "Технологии и будущее на русском" },
+          { name: "Perplexity.ai", desc: "Вместо Google — AI-поиск с источниками" },
+        ],
+      },
+    ],
+  },
+
+  // --- LEVEL 2: USAGE deep-dive ---
+  {
+    id: 'usage-deep',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "content",
+    title: "Lvl 2 — Usage: Пробуем и сравниваем",
+    content: "Попробовать разные чаты и понять, что модели — это не «всё знание человечества», а сильно отфильтрованный кусочек. У каждой компании свои safety filters, свои данные, своё понимание, как разговаривать с человеком.",
+    items: [
+      "DeepSeek — китайский, с другими культурными фильтрами и цензурой",
+      "GPT — «мейнстрим», старается быть поддерживающим, иногда слишком",
+      "Claude — глубокий, рефлексивный, лучше для длинных текстов и кода",
+      "Gemini — интегрирован с Google, хорош для поиска и мультимодальности",
+      "Perplexity — AI-поиск с цитированием источников, замена Google",
+    ],
+    note: "Время на уровне: 5–50 часов. Задайте каверзный вопрос в 3 разных чата — увидите разницу.",
+  },
+
+  {
+    id: 'usage-exercise',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "content",
+    title: "Упражнение: Тест на фильтры",
+    content: "Попробуйте задать одни и те же вопросы в DeepSeek, GPT и Claude. Особенно каверзные — про политику, этику, спорные темы.",
+    items: [
+      "«Что важнее: гармония в обществе или свобода слова?» — сравните ответы",
+      "«Объясни феномен X» (несуществующий) — кто начнет уверенно врать, а кто скажет «не знаю»?",
+      "Чем больше контекста даете — тем лучше ответ. Первая реакция «как тупо!» — нормальна",
+      "Синтетическая интуиция: научиться чувствовать, какая модель лучше для какой задачи",
     ],
   },
 
@@ -253,6 +371,7 @@ const slides = [
     type: "section",
     title: "Где искать идеи",
     subtitle: "Friction Auditing",
+    voxel: "/voxels/slide2-compass.html",
   },
 
   {
@@ -373,6 +492,7 @@ const slides = [
     type: "section",
     title: "От идеи к спецификации",
     subtitle: "PRD для вайб-кодинга",
+    voxel: "/voxels/slide4-archive.html",
   },
 
   {
@@ -483,6 +603,7 @@ const slides = [
     type: "section",
     title: "Vibe Coding Stack",
     subtitle: "2026",
+    voxel: "/voxels/slide1-builder.html",
   },
 
   {
@@ -576,6 +697,7 @@ const slides = [
     type: "section",
     title: "Creative Toolkit",
     subtitle: "Картинки, видео, звук",
+    voxel: "/voxels/slide9-mindshift.html",
   },
 
   {
@@ -650,6 +772,7 @@ const slides = [
     type: "section",
     title: "Agent Economy",
     subtitle: "& Second Mind",
+    voxel: "/voxels/slide3-steps.html",
   },
 
   {
@@ -724,6 +847,7 @@ const slides = [
     type: "section",
     title: "Workshop",
     subtitle: "& Demo Day",
+    voxel: "/voxels/slide1-builder.html",
   },
 
   {
