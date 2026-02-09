@@ -162,17 +162,17 @@ export const SCHEMA_NODES = [
     ]
   },
 
-  // --- Level 4 row: Building & Engineering ---
+  // --- Level 3 row: App Generators ---
   {
     id: 'coding-generators',
     type: NodeType.CODING,
     title: 'App Generators',
     description: 'Prompt-to-App tools. Speed over control.',
-    details: 'Tools for instant prototyping. Great for the "First 80%" of a product.',
+    details: 'Tools for instant prototyping. Great for the "First 80%" of a product. Google Build is the simplest entry point to vibe coding.',
     connections: ['coding-ide'],
-    tools: ['Lovable', 'Replit', 'bolt.new', 'v0.dev'],
+    tools: ['Google Build', 'Lovable', 'Replit', 'bolt.new', 'v0.dev'],
     timeEstimate: 'Weekend Project',
-    x: 1, y: 3,
+    x: 1, y: 2,
     toolDetails: [
       { name: 'Lovable', url: 'https://lovable.dev', category: 'Prompt-to-Application', description: 'Rapid full-stack prototyping with Supabase integration.', bestFor: 'Scaffolding full-stack foundations to export later.', pros: 'Fast scaffolding, GitHub integration.', cons: 'Expensive credit model, UI quality varies.' },
       { name: 'Replit', url: 'https://replit.com', category: 'Cloud IDE / Agent', description: 'All-in-one cloud environment. Zero setup deployment.', bestFor: 'Fast MVP/Demos, Non-technical founders.', pros: 'Zero setup, "0 to 1" speed.', cons: 'Harder for serious SaaS scaling, vendor lock-in.' },
@@ -183,17 +183,45 @@ export const SCHEMA_NODES = [
   {
     id: 'coding-ide',
     type: NodeType.CODING,
-    title: 'AI-Augmented IDEs',
+    title: 'IDEs',
     description: 'The "Last 20%". Logic, Refactoring, Scale.',
-    details: 'Where the real work happens. Moving from "Generating" to "Engineering". These tools keep you in the flow.',
-    connections: [],
+    details: 'Where the real work happens. Moving from "Generating" to "Engineering". Windsurf is currently more intuitive than Cursor for mixed teams.',
+    connections: ['coding-terminal', 'coding-agents'],
     tools: ['Cursor', 'Windsurf', 'Google AI Studio'],
     timeEstimate: 'Career Skill',
-    x: 2, y: 3,
+    x: 1, y: 3,
     toolDetails: [
       { name: 'Cursor', url: 'https://cursor.com', category: 'AI-First IDE', description: 'Fork of VS Code. Deep context control.', bestFor: 'Pro dev, Refactoring, Scalable projects.', pros: 'Deep context, predictable subscription.', cons: 'Performance drops occasionally.' },
       { name: 'Windsurf', url: 'https://codeium.com/windsurf', category: 'Flow IDE', description: 'Focuses on "Flow" and deep agentic behavior (Cascade).', bestFor: 'Automating routine, mixed teams.', pros: 'Intuitive UX, live preview.', cons: 'Credit model for some actions.' },
       { name: 'Google AI Studio', url: 'https://aistudio.google.com', category: 'Model Interface', description: 'Sandbox for prompt engineering and API code generation.', bestFor: 'Embedding AI functions, testing prompts.', pros: 'Fast cycle, Export to code.', cons: 'Rate limits on free tier.' }
+    ]
+  },
+  {
+    id: 'coding-terminal',
+    type: NodeType.CODING,
+    title: 'Terminal & CLI',
+    description: 'Claude Code, agentic terminal workflows.',
+    details: 'Advanced tweaking via conversational CLI. Bridging the gap between vibe-coding and traditional engineering.',
+    connections: [],
+    tools: ['Claude Code', 'Aider', 'GitHub Copilot CLI'],
+    timeEstimate: 'Deep Skill',
+    x: 1, y: 4,
+    toolDetails: [
+      { name: 'Claude Code', url: 'https://docs.anthropic.com/en/docs/claude-code', category: 'CLI Agent', description: 'Conversational interface for granular codebase control.', bestFor: 'Complex refactoring, debugging.', pros: 'Deep context, precise edits.', cons: 'Requires terminal comfort.' },
+    ]
+  },
+  {
+    id: 'coding-agents',
+    type: NodeType.CODING,
+    title: 'Creating Agents',
+    description: 'MCP, Workflows, Autonomous pipelines.',
+    details: 'Building agents that work for you while you sleep. From simple automations to complex multi-step pipelines.',
+    connections: [],
+    tools: ['MCP', 'n8n', 'Zapier AI'],
+    timeEstimate: 'Ongoing',
+    x: 2, y: 4,
+    toolDetails: [
+      { name: 'MCP', url: 'https://modelcontextprotocol.io', category: 'Protocol', description: 'Model Context Protocol — connecting AI to external tools and data.', bestFor: 'Custom integrations, tool orchestration.', pros: 'Open standard, growing ecosystem.', cons: 'Technical setup required.' },
     ]
   },
   {
@@ -205,7 +233,7 @@ export const SCHEMA_NODES = [
     connections: ['creative-image', 'creative-video', 'music-gen'],
     tools: ['RunPod', 'HuggingFace', 'CivitAI'],
     timeEstimate: 'Lifetime Mastery',
-    x: 3, y: 3,
+    x: 3, y: 4,
     toolDetails: [
       { name: 'CivitAI', url: 'https://civitai.com', category: 'Model Hub', description: 'The place for Loras, Checkpoints, and training.', bestFor: 'Finding specific styles/characters.', pros: 'Huge community, Easy simple training.', cons: 'NSFW content prevalence, SD-focused.' },
       { name: 'HuggingFace', url: 'https://huggingface.co', category: 'Repo', description: 'The GitHub of ML models.', bestFor: 'Finding weights, Spaces.', pros: 'Industry standard.', cons: 'Technical.' },

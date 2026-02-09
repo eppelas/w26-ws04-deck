@@ -57,66 +57,6 @@ const slides = [
   },
 
   // ═══════════════════════════════════════════
-  // BLOCK 0.5: CHECK-IN POLLS
-  // ═══════════════════════════════════════════
-
-  {
-    id: 4,
-    block: 0,
-    blockTitle: "Opening",
-    type: "poll",
-    title: "Как ты себя чувствуешь?",
-    subtitle: "Zoom Poll",
-    voxel: "/voxels/slide1-builder.html",
-    options: [
-      { svg: "overwhelmed", label: "Overwhelmed", desc: "Слишком много всего" },
-      { svg: "excited", label: "Excited", desc: "Хочу больше" },
-      { svg: "confused", label: "Confused", desc: "Пока не понимаю, куда это все" },
-      { svg: "calm", label: "Calm", desc: "Начинаю разбираться" },
-    ],
-  },
-
-  {
-    id: 5,
-    block: 0,
-    blockTitle: "Opening",
-    type: "poll",
-    title: "Где ты на шкале AI?",
-    subtitle: "1-10",
-    svg: "scale",
-    open: true,
-    scale: { min: 1, max: 10, labelMin: "Знаю что существует", labelMax: "Не могу без AI прожить день" },
-  },
-
-  {
-    id: 6,
-    block: 0,
-    blockTitle: "Opening",
-    type: "poll",
-    title: "Что было самым полезным?",
-    subtitle: "Zoom Chat",
-    svg: "useful",
-    open: true,
-    prompt: "Одна вещь из трех недель, которая реально изменила что-то в твоей жизни или работе",
-  },
-
-  {
-    id: 7,
-    block: 0,
-    blockTitle: "Opening",
-    type: "poll",
-    title: "Что ты уже сделал с помощью AI?",
-    subtitle: "Zoom Poll",
-    voxel: "/voxels/slide3-steps.html",
-    options: [
-      { svg: "calm", label: "Пока ничего", desc: "Но собираюсь" },
-      { svg: "confused", label: "Промпты", desc: "Попробовал(а) разные модели" },
-      { svg: "useful", label: "Для работы", desc: "Создал(а) что-то полезное" },
-      { svg: "progress", label: "Свой инструмент", desc: "Построил(а) приложение или автоматизацию" },
-    ],
-  },
-
-  // ═══════════════════════════════════════════
   // BLOCK 1: RECAP
   // ═══════════════════════════════════════════
 
@@ -192,6 +132,66 @@ const slides = [
       { text: "Понимание роли контекста. Я даже стал активнее слушать людей, поняв, как контекст работает.", tag: "WS01" },
       { text: "Вернул чувство цифровой свободы. Никаких ограничений нету.", tag: "Tools" },
       { text: "Это лаборатория, где расширяется представление. Майндсет накапливается.", tag: "WS01" },
+    ],
+  },
+
+  // ═══════════════════════════════════════════
+  // CHECK-IN POLLS (Zoom Questions)
+  // ═══════════════════════════════════════════
+
+  {
+    id: 4,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Как ты себя чувствуешь?",
+    subtitle: "Zoom Poll",
+    voxel: "/voxels/slide1-builder.html",
+    options: [
+      { svg: "overwhelmed", label: "Overwhelmed", desc: "Слишком много всего" },
+      { svg: "excited", label: "Excited", desc: "Хочу больше" },
+      { svg: "confused", label: "Confused", desc: "Пока не понимаю, куда это все" },
+      { svg: "calm", label: "Calm", desc: "Начинаю разбираться" },
+    ],
+  },
+
+  {
+    id: 5,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Где ты на шкале AI?",
+    subtitle: "1-10",
+    svg: "scale",
+    open: true,
+    scale: { min: 1, max: 10, labelMin: "Знаю что существует", labelMax: "Не могу без AI прожить день" },
+  },
+
+  {
+    id: 6,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Что было самым полезным?",
+    subtitle: "Zoom Chat",
+    svg: "useful",
+    open: true,
+    prompt: "Одна вещь из трех недель, которая реально изменила что-то в твоей жизни или работе",
+  },
+
+  {
+    id: 7,
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll",
+    title: "Что ты уже сделал с помощью AI?",
+    subtitle: "Zoom Poll",
+    voxel: "/voxels/slide3-steps.html",
+    options: [
+      { svg: "calm", label: "Пока ничего", desc: "Но собираюсь" },
+      { svg: "confused", label: "Промпты", desc: "Попробовал(а) разные модели" },
+      { svg: "useful", label: "Для работы", desc: "Создал(а) что-то полезное" },
+      { svg: "progress", label: "Свой инструмент", desc: "Построил(а) приложение или автоматизацию" },
     ],
   },
 
@@ -325,6 +325,22 @@ const slides = [
     ],
   },
 
+  // --- LEVEL 4: BUILDING & ENGINEERING ---
+  {
+    id: 'building-intro',
+    block: 2,
+    blockTitle: "Mindset Shift",
+    type: "content",
+    title: "Lvl 4 — Building & Engineering: Создаем инструменты",
+    content: "Когда у нас есть контекст — мы можем начать строить. Самый простой вход: Google Build.",
+    items: [
+      "Google Build — вайб-кодинг за 5 минут, без установки, просто в браузере",
+      "App Generators (Lovable, bolt.new, Replit) — прототип за выходные",
+      "IDEs (Windsurf, Cursor) — последние 20%, логика, рефакторинг, масштаб",
+    ],
+    note: "Время на уровне: 50–200+ часов. Цель: создавать свои инструменты.",
+  },
+
   {
     id: 14,
     block: 2,
@@ -334,16 +350,18 @@ const slides = [
   },
 
   {
-    id: 15,
+    id: 'finding-ideas',
     block: 2,
     blockTitle: "Mindset Shift",
     type: "content",
-    title: "Два ключевых навыка",
+    title: "Самое сложное — найти идею",
     items: [
-      "Уметь находить идеи — замечать трения в жизни",
-      "Уметь объяснять задачи — превращать боль в спецификацию",
+      "Pain-to-Prompt: записывай голосовое, когда чувствуешь раздражение от задачи",
+      "Правило «Второго раза»: делаешь что-то второй раз — думай об автоматизации",
+      "Поиск по жалобам: «I hate when...», «Why is there no...» в сообществах",
+      "Поиск по стыкам: [твои интересы] + AI workflow",
     ],
-    note: "В этом помогают: (1) насмотренность — community, чатик, шеринг; (2) просто брать, делать и пробовать бесконечно.",
+    note: "В этом помогают: насмотренность (community, чатик, шеринг) и бесконечные пробы.",
   },
 
   // ═══════════════════════════════════════════
@@ -545,6 +563,23 @@ const slides = [
   },
 
   {
+    id: 'prd-questions',
+    block: 4,
+    blockTitle: "PRD",
+    type: "content",
+    title: "Вопросы для правильного PRD",
+    content: "Задай себе эти вопросы прежде чем писать промпт:",
+    items: [
+      "Кто пользователь? (бабушка? риэлтор? я сам?)",
+      "Какие 2-3 главных состояния? (тишина → слушаю → вывожу текст)",
+      "Что точно НЕ нужно? (Non-Goals: без БД, без авторизации, без мобильной версии)",
+      "Как выглядит успех? (бабушка видит текст на планшете = win)",
+      "Какой инструмент? (Google Build для прототипа, Cursor для серьезного)",
+    ],
+    note: "Промпт «напиши туду-менеджер для риэлторов» может дать как связку бананов, так и B2B SaaS на 300 менеджеров. Разница — в деталях.",
+  },
+
+  {
     id: 28,
     block: 4,
     blockTitle: "PRD",
@@ -642,6 +677,23 @@ const slides = [
   },
 
   {
+    id: 'ides-comparison',
+    block: 5,
+    blockTitle: "Vibe Coding",
+    type: "content",
+    title: "Windsurf vs Cursor: почему Windsurf сейчас прикольнее",
+    items: [
+      "Cascade Agent — понимает весь dependency graph проекта, а не файл за файлом",
+      "Instant Apply — рефакторинг 50+ файлов одним промптом",
+      "Live Preview — видишь результат прямо в IDE",
+      "Интуитивный UX для смешанных команд (не только для хардкорных девов)",
+      "Cursor: глубокий контроль, Composer mode, предсказуемая подписка",
+      "Claude Code: agentic CLI, когда визуальные билдеры достигают предела",
+    ],
+    note: "Попробуешь бесплатно, поймешь насколько сложно. Потом заплатишь 50 евро и идеи будут реализовываться в 50 раз быстрее.",
+  },
+
+  {
     id: 33,
     block: 5,
     blockTitle: "Vibe Coding",
@@ -700,6 +752,22 @@ const slides = [
       "Character reference — сохранение персонажа между генерациями",
       "Inpaint: не обязательно перегенерировать всю картинку",
     ],
+  },
+
+  {
+    id: 'nanobanano-pro',
+    block: 6,
+    blockTitle: "Creative Toolkit",
+    type: "content",
+    title: "NanoBanana Pro — прорыв 2026",
+    content: "Gemini 2.5 Flash + нативная генерация изображений. Что изменилось?",
+    items: [
+      "JSON-редактирование: описываешь изменения структурой — меняется только нужная часть картинки",
+      "Цифры и координаты: лучше всех работает с числами, временем, количеством",
+      "Сохранение персонажа: итеративное редактирование без потери идентичности",
+      "Разговорное редактирование: «убери фон», «измени выражение на улыбку» — и это работает",
+    ],
+    note: "Доступна: Fusara.ai, Google ImageFX, Google Gemini Chat",
   },
 
   {
