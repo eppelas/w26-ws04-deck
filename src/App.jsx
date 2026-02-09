@@ -5,8 +5,10 @@ import ProgressBar from './components/ProgressBar'
 import BlockNav from './components/BlockNav'
 import DMapPage from './components/DMapPage'
 import InteractionMap from './components/layers/InteractionMap'
+import AimSpirit from './components/spirit/AimSpirit'
 
 export default function App() {
+  const [sessionStartTime] = useState(() => Date.now())
   const [current, setCurrent] = useState(() => {
     const saved = localStorage.getItem('ws04_slide')
     const idx = saved ? parseInt(saved, 10) : 0
@@ -81,6 +83,7 @@ export default function App() {
   return (
     <div className="h-screen w-screen flex flex-col bg-white overflow-hidden">
       <ProgressBar current={current} total={total} slide={slide} onLayersClick={() => setShowLayers(true)} />
+      <AimSpirit slide={slide} slideIndex={current} totalSlides={total} sessionStartTime={sessionStartTime} />
 
       <main className="flex-1 overflow-visible flex items-center justify-center px-6 md:px-16 lg:px-24">
         <div key={slide.id} className="w-full max-w-5xl animate-fade-in">
