@@ -31,10 +31,12 @@ export default function AimSpirit({ slide, slideIndex, totalSlides, sessionStart
     }
   }, [sessionStartTime, slideIndex])
 
-  // toggle with Shift+S
+  // toggle with 's' key (no modifier needed)
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'S' && e.shiftKey) {
+      if (e.key === 's' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        // don't intercept if user is typing in an input
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
         e.preventDefault()
         setVisible(v => !v)
       }

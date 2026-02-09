@@ -215,8 +215,23 @@ function RecapSlide({ s }) {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-2xl font-extrabold text-swiss-black tracking-tight">{s.title}</h2>
-        {s.speaker && <p className="text-sm text-swiss-muted mt-1">{s.speaker}</p>}
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-extrabold text-swiss-black tracking-tight">{s.title}</h2>
+          {s.slidesUrl && (
+            <a href={s.slidesUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-swiss-muted border border-swiss-gray/50 rounded px-2 py-0.5 hover:text-swiss-red hover:border-swiss-red/40 transition-colors">slides &rarr;</a>
+          )}
+        </div>
+        {s.speaker && (
+          <p className="text-sm text-swiss-muted mt-1">
+            {s.speaker}{s.date && <span> &middot; {s.date}</span>}
+          </p>
+        )}
+        {s.tagline && (
+          <span className="inline-flex items-center gap-1.5 text-xs text-swiss-red border border-swiss-red/30 rounded-full px-3 py-0.5 mt-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-swiss-red" />
+            {s.tagline}
+          </span>
+        )}
       </div>
       <ul className="space-y-2">
         {s.items.map((item, i) => (
@@ -230,6 +245,13 @@ function RecapSlide({ s }) {
         <blockquote className="border-l-4 border-swiss-red/30 pl-4 mt-4 text-swiss-muted italic text-sm">
           {s.quote}
         </blockquote>
+      )}
+      {s.tools && s.tools.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {s.tools.map((tool, i) => (
+            <span key={i} className="text-[10px] text-swiss-muted bg-swiss-gray/20 border border-swiss-gray/40 rounded px-2 py-0.5">{tool}</span>
+          ))}
+        </div>
       )}
     </div>
   )

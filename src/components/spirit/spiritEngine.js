@@ -1,53 +1,122 @@
 // ═══════════════════════════════════════════════════════════════
-// Spirit Engine — physics, drawing, sleep, particles, bubbles
-// Ported from aim-character.html (Tanki project)
+// Spirit Engine — voxel-art character, perimeter wandering
+// Inspired by Tanki (anca-image-to-voxel-art) visual style
+// Swiss palette: #171717 black, #D4D4D4 gray, #DC2626 red
 // ═══════════════════════════════════════════════════════════════
 
 import { PHRASES, pick, getSlideRemark, getBlockEnergy } from './spiritPersonality'
 import { getPacingHint } from './spiritPacing'
 
-// ─── CONFIG ──────────────────────────────────────────────────
+const BLACK = '#171717'
+const GRAY  = '#D4D4D4'
+const MUTED = '#737373'
+const RED   = '#DC2626'
+const WHITE = '#FFFFFF'
+
+// isometric projection helpers
+const ISO_ANGLE = Math.PI / 6 // 30 degrees
+const COS_A = Math.cos(ISO_ANGLE)
+const SIN_A = Math.sin(ISO_ANGLE)
+
+function isoX(x, y, z) { return (x - z) * COS_A }
+function isoY(x, y, z) { return -y + (x + z) * SIN_A }
 
 const CONFIG = {
-  size: 14,
-  lineWidth: 1.2,
-  headRatio: 1.0,
+  voxelSize: 3,           // size of each voxel cube in px
+  scale: 1.0,             // overall character scale
 
-  // swiss design palette
-  bodyColor: '#737373',
-  eyeColor: '#444',
-  blushColor: 'rgba(220,38,38,0.10)',
-  glyphColor: '#DC2626',
-  trailColor: 'rgba(220,38,38,0.05)',
-  bubbleBackground: 'rgba(23,23,23,0.90)',
+  bubbleBackground: 'rgba(23,23,23,0.92)',
   bubbleText: '#bbb',
   bubbleFontSize: 11,
   bubbleFontWeight: 400,
 
-  wanderSpeed: 0.02,
-  maxSpeed: 2.5,
-  friction: 0.975,
-  gravity: 0.005,
-  bounciness: 0.5,
+  wanderSpeed: 0.015,
+  maxSpeed: 1.8,
+  friction: 0.978,
+  gravity: 0.003,
+  bounciness: 0.4,
 
-  cursorRadius: 90,
-  cursorChaseForce: 0.03,
+  perimeterMargin: 80,    // how far from edge the character stays
+  perimeterInner: 200,    // inner boundary — don't go into content area
+
+  cursorRadius: 100,
+  cursorChaseForce: 0.02,
   clickPushForce: 2,
   manyClickThreshold: 5,
 
-  sleepAfterIdle: 25,
-  sleepCornerPadding: 20,
-  wakeRadius: 50,
+  sleepAfterIdle: 30,
+  sleepCornerPadding: 40,
+  wakeRadius: 60,
 
   phases: {
-    newcomer:    { after: 0,    eyeScale: 1.3, smileCurve: 0.15, glyphOpacity: 0.3 },
-    comfortable: { after: 60,   eyeScale: 1.1, smileCurve: 0.25, glyphOpacity: 0.5 },
-    inspired:    { after: 180,  eyeScale: 1.0, smileCurve: 0.35, glyphOpacity: 0.8 },
-    deep:        { after: 420,  eyeScale: 0.9, smileCurve: 0.2,  glyphOpacity: 1.0 },
+    newcomer:    { after: 0,    eyeScale: 1.3, glyphOpacity: 0.3, bodyHue: 0 },
+    comfortable: { after: 60,   eyeScale: 1.1, glyphOpacity: 0.5, bodyHue: 0 },
+    inspired:    { after: 180,  eyeScale: 1.0, glyphOpacity: 0.8, bodyHue: 0 },
+    deep:        { after: 420,  eyeScale: 0.9, glyphOpacity: 1.0, bodyHue: 0 },
   },
 }
 
-// ─── ENGINE STATE ────────────────────────────────────────────
+// ─── VOXEL CHARACTER MODEL ──────────────────────────────────
+// Each voxel: [x, y, z, colorIndex]
+// colorIndex: 0=black, 1=gray, 2=red, 3=white, 4=dark-gray, 5=light-gray
+
+const COLORS = [BLACK, GRAY, RED, WHITE, '#333333', '#AAAAAA', 'rgba(220,38,38,0.5)']
+
+function buildCharacterModel() {
+  const voxels = []
+  const v = (x, y, z, c) => voxels.push([x, y, z, c])
+
+  // === BODY (dark core with gray shell) ===
+  // torso — 3 wide, 4 tall, 2 deep
+  for (let y = 0; y < 4; y++) {
+    for (let x = -1; x <= 1; x++) {
+      v(x, y, 0, y < 2 ? 0 : 4) // front face
+      if (y < 3) v(x, y, 1, 4)   // back
+    }
+  }
+  // shoulders wider
+  v(-2, 3, 0, 1); v(2, 3, 0, 1)
+
+  // === HEAD (larger, rounder, on top of body) ===
+  // 5 wide, 5 tall, 3 deep — main head block
+  for (let y = 4; y < 9; y++) {
+    for (let x = -2; x <= 2; x++) {
+      for (let z = -1; z <= 1; z++) {
+        // skip corners for rounder shape
+        if (Math.abs(x) === 2 && Math.abs(z) === 1 && (y === 4 || y === 8)) continue
+        if (Math.abs(x) === 2 && y === 8) continue
+        v(x, y, z, 0) // dark head
+      }
+    }
+  }
+  // top of head — smaller
+  v(-1, 9, 0, 0); v(0, 9, 0, 0); v(1, 9, 0, 0)
+
+  // === EYES (white with dark pupil) ===
+  v(-1, 7, -2, 3) // left eye white
+  v(1, 7, -2, 3)  // right eye white
+
+  // === BLUSH (subtle red under eyes) ===
+  v(-2, 6, -1, 6) // left blush (semi-transparent red)
+  v(2, 6, -1, 6)  // right blush
+
+  // === AIM GLYPH (red mark on forehead) ===
+  v(0, 8, -2, 2)  // center red dot
+
+  // === LEGS ===
+  v(-1, -1, 0, 4); v(-1, -2, 0, 1) // left leg
+  v(1, -1, 0, 4);  v(1, -2, 0, 1)  // right leg
+
+  // === FEET ===
+  v(-1, -3, 0, 1); v(-1, -3, -1, 1)
+  v(1, -3, 0, 1);  v(1, -3, -1, 1)
+
+  return voxels
+}
+
+const CHARACTER_MODEL = buildCharacterModel()
+
+// ═══════════════════════════════════════════════════════════════
 
 export function createSpiritEngine(canvas) {
   const ctx = canvas.getContext('2d')
@@ -56,7 +125,6 @@ export function createSpiritEngine(canvas) {
   let fontReady = false
   let animId = null
 
-  // external refs (set via setSlide)
   let currentSlide = null
   let slideIndex = 0
   let totalSlides = 1
@@ -81,18 +149,24 @@ export function createSpiritEngine(canvas) {
 
   let lastPhase = 'newcomer'
 
-  // ─── particles ─────────────────────────────────
+  // ─── particles (voxel-style squares) ───────────
 
   const particles = []
 
   function spawnParticles(x, y, count, color) {
     for (let i = 0; i < count; i++) {
       const a = Math.random() * Math.PI * 2
-      const s = 0.5 + Math.random() * 1.5
+      const s = 0.5 + Math.random() * 2
       particles.push({
-        x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 0.3,
-        life: 1, decay: 0.02 + Math.random() * 0.02,
-        size: 0.8 + Math.random() * 1.2, color,
+        x, y,
+        vx: Math.cos(a) * s,
+        vy: Math.sin(a) * s - 0.5,
+        life: 1,
+        decay: 0.015 + Math.random() * 0.015,
+        size: 1.5 + Math.random() * 2.5,
+        color,
+        rot: Math.random() * Math.PI,
+        rotV: (Math.random() - 0.5) * 0.1,
       })
     }
   }
@@ -100,18 +174,56 @@ export function createSpiritEngine(canvas) {
   function updateParticles() {
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i]
-      p.x += p.vx; p.y += p.vy; p.vy += 0.02; p.life -= p.decay
+      p.x += p.vx; p.y += p.vy; p.vy += 0.015; p.life -= p.decay
+      p.rot += p.rotV
       if (p.life <= 0) particles.splice(i, 1)
     }
   }
 
   function drawParticles() {
     for (const p of particles) {
-      ctx.globalAlpha = p.life * 0.5
+      ctx.save()
+      ctx.globalAlpha = p.life * 0.6
+      ctx.translate(p.x, p.y)
+      ctx.rotate(p.rot)
       ctx.fillStyle = p.color
-      ctx.beginPath()
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-      ctx.fill()
+      // square particles for voxel feel
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size)
+      ctx.restore()
+    }
+    ctx.globalAlpha = 1
+  }
+
+  // ─── ambient floating voxels ───────────────────
+
+  const ambientVoxels = []
+  function initAmbientVoxels() {
+    for (let i = 0; i < 6; i++) {
+      ambientVoxels.push({
+        offsetX: (Math.random() - 0.5) * 60,
+        offsetY: -20 - Math.random() * 30,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.3 + Math.random() * 0.5,
+        size: 1.5 + Math.random() * 2,
+        color: Math.random() > 0.3 ? GRAY : RED,
+        rotPhase: Math.random() * Math.PI * 2,
+      })
+    }
+  }
+  initAmbientVoxels()
+
+  function drawAmbientVoxels(cx, cy) {
+    const phase = getPhaseData()
+    ctx.globalAlpha = phase.glyphOpacity * 0.25
+    for (const av of ambientVoxels) {
+      const px = cx + av.offsetX + Math.sin(time * av.speed + av.phase) * 8
+      const py = cy + av.offsetY + Math.cos(time * av.speed * 0.7 + av.phase) * 4
+      ctx.save()
+      ctx.translate(px, py)
+      ctx.rotate(time * 0.3 + av.rotPhase)
+      ctx.fillStyle = av.color
+      ctx.fillRect(-av.size / 2, -av.size / 2, av.size, av.size)
+      ctx.restore()
     }
     ctx.globalAlpha = 1
   }
@@ -155,25 +267,18 @@ export function createSpiritEngine(canvas) {
     const bw = fullWidth + pad * 2
     const bh = CONFIG.bubbleFontSize + pad * 2 - 2
     let bx = Math.max(6, Math.min(W - bw - 6, x - bw / 2))
-    let by = Math.max(6, y - CONFIG.size * CONFIG.headRatio - 28 + bubble.slideY)
+    let by = Math.max(6, y - 50 + bubble.slideY)
     ctx.globalAlpha = bubble.opacity * 0.95
 
     // shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.12)'
-    roundRect(ctx, bx + 1, by + 2, bw, bh, 4); ctx.fill()
+    ctx.fillStyle = 'rgba(0,0,0,0.15)'
+    ctx.fillRect(bx + 2, by + 2, bw, bh) // square shadow for voxel feel
     // bg
     ctx.fillStyle = CONFIG.bubbleBackground
-    ctx.strokeStyle = 'rgba(255,255,255,0.07)'
-    ctx.lineWidth = 0.5
-    roundRect(ctx, bx, by, bw, bh, 4); ctx.fill(); ctx.stroke()
-    // tail
-    ctx.fillStyle = CONFIG.bubbleBackground
-    ctx.beginPath()
-    const tailX = Math.max(bx + 8, Math.min(bx + bw - 8, x))
-    ctx.moveTo(tailX - 3, by + bh)
-    ctx.lineTo(tailX + 3, by + bh)
-    ctx.lineTo(tailX, by + bh + 4)
-    ctx.closePath(); ctx.fill()
+    ctx.fillRect(bx, by, bw, bh)
+    // tiny red accent line at top
+    ctx.fillStyle = RED
+    ctx.fillRect(bx, by, bw, 1.5)
     // text
     ctx.textBaseline = 'middle'
     ctx.fillStyle = CONFIG.bubbleText
@@ -181,20 +286,12 @@ export function createSpiritEngine(canvas) {
     ctx.restore()
   }
 
-  function roundRect(c, x, y, w, h, r) {
-    c.beginPath(); c.moveTo(x + r, y); c.lineTo(x + w - r, y)
-    c.quadraticCurveTo(x + w, y, x + w, y + r); c.lineTo(x + w, y + h - r)
-    c.quadraticCurveTo(x + w, y + h, x + w - r, y + h); c.lineTo(x + r, y + h)
-    c.quadraticCurveTo(x, y + h, x, y + h - r); c.lineTo(x, y + r)
-    c.quadraticCurveTo(x, y, x + r, y); c.closePath()
-  }
-
   // ─── zzz ───────────────────────────────────────
 
   const zzzList = []
   function updateZzz(sleeping, x, y) {
-    if (sleeping && Math.random() < 0.015) {
-      zzzList.push({ x: x + 6, y: y - 8, vx: 0.12, vy: -0.2, life: 1, size: 6 + Math.random() * 2 })
+    if (sleeping && Math.random() < 0.012) {
+      zzzList.push({ x: x + 8, y: y - 15, vx: 0.15, vy: -0.25, life: 1, size: 7 + Math.random() * 3 })
     }
     for (let i = zzzList.length - 1; i >= 0; i--) {
       const z = zzzList[i]; z.x += z.vx; z.y += z.vy; z.life -= 0.005; z.size += 0.02
@@ -206,7 +303,7 @@ export function createSpiritEngine(canvas) {
     for (const z of zzzList) {
       ctx.globalAlpha = z.life * 0.3
       ctx.font = `300 ${Math.round(z.size)}px "IBM Plex Mono", monospace`
-      ctx.fillStyle = '#555'; ctx.fillText('z', z.x, z.y)
+      ctx.fillStyle = MUTED; ctx.fillText('z', z.x, z.y)
     }
     ctx.globalAlpha = 1
   }
@@ -225,13 +322,37 @@ export function createSpiritEngine(canvas) {
     breathPhase: 0,
     floatPhase: Math.random() * Math.PI * 2,
     trail: [],
+    facing: 1, // 1 = right, -1 = left
   }
 
   let waypoint = { x: 0, y: 0 }, wpTimer = 0
 
-  function newWaypoint() {
-    waypoint.x = 40 + Math.random() * (W - 80)
-    waypoint.y = 40 + Math.random() * (H - 80)
+  // ─── PERIMETER WAYPOINTS ───────────────────────
+  // Generate waypoints along the edges of the screen
+
+  function newPerimeterWaypoint() {
+    const m = CONFIG.perimeterMargin
+    const inner = CONFIG.perimeterInner
+    // pick a random edge: 0=top, 1=right, 2=bottom, 3=left
+    const edge = Math.floor(Math.random() * 4)
+    switch (edge) {
+      case 0: // top
+        waypoint.x = m + Math.random() * (W - m * 2)
+        waypoint.y = m + Math.random() * 30
+        break
+      case 1: // right
+        waypoint.x = W - m - Math.random() * 30
+        waypoint.y = m + Math.random() * (H - m * 2)
+        break
+      case 2: // bottom
+        waypoint.x = m + Math.random() * (W - m * 2)
+        waypoint.y = H - m - Math.random() * 30
+        break
+      case 3: // left
+        waypoint.x = m + Math.random() * 30
+        waypoint.y = m + Math.random() * (H - m * 2)
+        break
+    }
     wpTimer = 0
   }
 
@@ -240,216 +361,185 @@ export function createSpiritEngine(canvas) {
     const c = [
       { x: p, y: H - p },
       { x: W - p, y: H - p },
-      { x: p, y: p + 10 },
-      { x: W - p, y: p + 10 },
     ]
     return c[Math.floor(Math.random() * c.length)]
   }
 
-  // ─── drawing ───────────────────────────────────
+  // ─── VOXEL CHARACTER DRAWING ───────────────────
+
+  function drawVoxel(sx, sy, size, color, highlight = true) {
+    // isometric cube face — top, left, right
+    const hs = size / 2
+
+    // top face (lighter)
+    ctx.fillStyle = color
+    ctx.beginPath()
+    ctx.moveTo(sx, sy - hs)
+    ctx.lineTo(sx + hs * COS_A, sy - hs + hs * SIN_A)
+    ctx.lineTo(sx, sy - hs + hs * SIN_A * 2)
+    ctx.lineTo(sx - hs * COS_A, sy - hs + hs * SIN_A)
+    ctx.closePath()
+    ctx.fill()
+
+    // left face (darker)
+    ctx.fillStyle = darken(color, 0.7)
+    ctx.beginPath()
+    ctx.moveTo(sx - hs * COS_A, sy - hs + hs * SIN_A)
+    ctx.lineTo(sx, sy - hs + hs * SIN_A * 2)
+    ctx.lineTo(sx, sy + hs * SIN_A * 2 - hs + hs)
+    ctx.lineTo(sx - hs * COS_A, sy + hs * SIN_A)
+    ctx.closePath()
+    ctx.fill()
+
+    // right face (medium)
+    ctx.fillStyle = darken(color, 0.85)
+    ctx.beginPath()
+    ctx.moveTo(sx + hs * COS_A, sy - hs + hs * SIN_A)
+    ctx.lineTo(sx, sy - hs + hs * SIN_A * 2)
+    ctx.lineTo(sx, sy + hs * SIN_A * 2 - hs + hs)
+    ctx.lineTo(sx + hs * COS_A, sy + hs * SIN_A)
+    ctx.closePath()
+    ctx.fill()
+
+    // highlight edge on top
+    if (highlight) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)'
+      ctx.lineWidth = 0.5
+      ctx.beginPath()
+      ctx.moveTo(sx - hs * COS_A, sy - hs + hs * SIN_A)
+      ctx.lineTo(sx, sy - hs)
+      ctx.lineTo(sx + hs * COS_A, sy - hs + hs * SIN_A)
+      ctx.stroke()
+    }
+  }
+
+  const colorCache = {}
+  function darken(hex, factor) {
+    const key = hex + factor
+    if (colorCache[key]) return colorCache[key]
+    // handle rgba
+    if (hex.startsWith('rgba')) {
+      const m = hex.match(/[\d.]+/g)
+      const r = Math.round(parseFloat(m[0]) * factor)
+      const g = Math.round(parseFloat(m[1]) * factor)
+      const b = Math.round(parseFloat(m[2]) * factor)
+      const result = `rgba(${r},${g},${b},${m[3]})`
+      colorCache[key] = result
+      return result
+    }
+    let r, g, b
+    if (hex.length === 7) {
+      r = parseInt(hex.slice(1, 3), 16)
+      g = parseInt(hex.slice(3, 5), 16)
+      b = parseInt(hex.slice(5, 7), 16)
+    } else {
+      return hex
+    }
+    const result = `rgb(${Math.round(r * factor)},${Math.round(g * factor)},${Math.round(b * factor)})`
+    colorCache[key] = result
+    return result
+  }
 
   function drawCharacter() {
-    const S = CONFIG.size
     const phase = getPhaseData()
-    const lw = CONFIG.lineWidth
+    const vs = CONFIG.voxelSize * CONFIG.scale
 
     ctx.save()
-    ctx.translate(ch.x, ch.y + ch.hopY)
-    ctx.rotate(ch.tilt)
-    ctx.scale(1 + (1 - ch.squash) * 0.3, ch.squash)
 
-    const breathOffset = Math.sin(ch.breathPhase) * 0.8
-    const floatY = Math.sin(ch.floatPhase) * 1.5
-    ctx.translate(0, floatY)
+    const floatY = Math.sin(ch.floatPhase) * 2
+    const breathScale = 1 + Math.sin(ch.breathPhase) * 0.02
+    const baseX = ch.x
+    const baseY = ch.y + ch.hopY + floatY
 
-    const headR = S * CONFIG.headRatio
+    // squash-stretch
+    ctx.translate(baseX, baseY)
+    ctx.scale(ch.facing * (1 + (1 - ch.squash) * 0.15) * breathScale, ch.squash * breathScale)
+    ctx.rotate(ch.tilt * 0.5)
+    ctx.translate(-baseX, -baseY)
 
-    // shadow
+    // shadow — isometric ellipse on ground
     ctx.save()
-    ctx.translate(0, headR + S * 0.7 + 4)
-    ctx.scale(1, 0.2)
+    ctx.globalAlpha = 0.08
+    ctx.fillStyle = BLACK
     ctx.beginPath()
-    ctx.arc(0, 0, S * 0.4, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(0,0,0,0.06)'
+    ctx.ellipse(baseX, baseY + 25, 18, 5, 0, 0, Math.PI * 2)
     ctx.fill()
     ctx.restore()
 
-    // body
-    const bodyTop = headR * 0.6
-    const bodyBottom = headR + S * 0.55
-    ctx.strokeStyle = CONFIG.bodyColor
-    ctx.lineWidth = lw
-    ctx.lineCap = 'round'
-    ctx.beginPath()
-    ctx.moveTo(0, bodyTop)
-    ctx.quadraticCurveTo(breathOffset * 0.3, bodyTop + (bodyBottom - bodyTop) * 0.5, 0, bodyBottom)
-    ctx.stroke()
-
-    // arms
-    const armY = bodyTop + (bodyBottom - bodyTop) * 0.3
-    const armLen = S * 0.45
-    const armWave = Math.sin(ch.legPhase * 0.7) * 3
-    ctx.lineWidth = lw * 0.8
-    ctx.beginPath()
-    ctx.moveTo(-1, armY)
-    ctx.quadraticCurveTo(-armLen * 0.6, armY + armWave + 2, -armLen, armY + 4 + armWave)
-    ctx.stroke()
-    ctx.beginPath()
-    ctx.moveTo(1, armY)
-    ctx.quadraticCurveTo(armLen * 0.6, armY - armWave + 2, armLen, armY + 4 - armWave)
-    ctx.stroke()
-
-    // legs
+    // draw each voxel with isometric projection
     const speed = Math.sqrt(ch.vx * ch.vx + ch.vy * ch.vy)
-    const legAmp = ch.sleeping ? 0 : Math.min(speed * 3, 8)
-    const legLen = S * 0.4
-    ctx.lineWidth = lw * 0.8
-    for (let i = 0; i < 2; i++) {
-      const side = i === 0 ? -1 : 1
-      const swing = Math.sin(ch.legPhase + i * Math.PI) * legAmp
-      const lx = side * 2
-      ctx.beginPath()
-      ctx.moveTo(lx, bodyBottom)
-      ctx.quadraticCurveTo(lx + swing * 0.4, bodyBottom + legLen * 0.5, lx + swing, bodyBottom + legLen)
-      ctx.stroke()
+    const legSwing = ch.sleeping ? 0 : Math.sin(ch.legPhase) * Math.min(speed * 2, 4)
+
+    // sort voxels for proper isometric layering (back to front)
+    const sorted = [...CHARACTER_MODEL].sort((a, b) => {
+      return (a[2] - b[2]) || (a[1] - b[1]) || (a[0] - b[0])
+    })
+
+    for (const [vx, vy, vz, ci] of sorted) {
+      let color = COLORS[ci]
+      let ox = vx, oy = vy, oz = vz
+
+      // leg animation
+      if (vy < 0) {
+        const isLeft = vx < 0
+        ox += (isLeft ? legSwing : -legSwing) * 0.3
+      }
+
+      // arm swing (shoulders)
+      if (vy === 3 && Math.abs(vx) === 2) {
+        const isLeft = vx < 0
+        oy += Math.sin(ch.legPhase + (isLeft ? 0 : Math.PI)) * Math.min(speed, 1) * 0.3
+      }
+
+      // glyph opacity for red forehead mark
+      if (ci === 2) {
+        ctx.globalAlpha = phase.glyphOpacity
+      } else if (ci === 6) {
+        ctx.globalAlpha = phase.glyphOpacity * 0.3
+      } else if (ci === 3 && vy === 7) {
+        // eyes — blink
+        if (ch.blinkState) {
+          color = BLACK
+        } else {
+          // eye tracking toward mouse
+          const pdx = mouse.x - ch.x
+          const pdy = mouse.y - ch.y
+          const pd = Math.sqrt(pdx * pdx + pdy * pdy)
+          if (pd > 10) {
+            ox += (pdx / pd) * 0.3 * ch.facing
+            oy += (pdy / pd) * 0.15
+          }
+        }
+        ctx.globalAlpha = 1
+      } else {
+        ctx.globalAlpha = 1
+      }
+
+      const sx = baseX + isoX(ox, oy, oz) * vs
+      const sy = baseY - isoY(ox, oy, oz) * vs
+
+      drawVoxel(sx, sy, vs, color, ci !== 6)
     }
 
-    // head
-    ctx.lineWidth = lw
-    ctx.beginPath()
-    ctx.ellipse(0, 0, headR * 0.85, headR * 0.92, 0, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(30,30,30,0.5)'
-    ctx.fill()
-    ctx.beginPath()
-    ctx.ellipse(0, 0, headR * 0.85, headR * 0.92, 0, 0, Math.PI * 2)
-    ctx.strokeStyle = CONFIG.bodyColor
-    ctx.stroke()
-
-    if (ch.sleeping) {
-      drawSleepingFace(headR, lw, phase)
-    } else {
-      drawFace(headR, lw, phase)
-    }
-
+    ctx.globalAlpha = 1
     ctx.restore()
   }
 
-  function drawFace(headR, lw, phase) {
-    const eyeY = -headR * 0.1
-    const eyeSpacing = headR * 0.32
-    const eyeR = headR * 0.14 * phase.eyeScale
-
-    // AIM glyph
-    if (phase.glyphOpacity > 0) {
-      ctx.globalAlpha = phase.glyphOpacity * 0.5
-      ctx.beginPath()
-      ctx.arc(0, -headR * 0.48, headR * 0.14, Math.PI, 0)
-      ctx.strokeStyle = CONFIG.glyphColor
-      ctx.lineWidth = lw * 0.8
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.moveTo(0, -headR * 0.48)
-      ctx.lineTo(0, -headR * 0.32)
-      ctx.stroke()
-      ctx.globalAlpha = 1
-    }
-
-    // eyes
-    if (!ch.blinkState) {
-      const pdx = mouse.x - ch.x, pdy = mouse.y - ch.y
-      const pd = Math.sqrt(pdx * pdx + pdy * pdy)
-      const shift = Math.min(pd > 0 ? 1 : 0, 1) * headR * 0.04
-      const sx = pd > 0 ? (pdx / pd) * shift : 0
-      const sy = pd > 0 ? (pdy / pd) * shift : 0
-      for (let side = -1; side <= 1; side += 2) {
-        const ex = eyeSpacing * side
-        ctx.beginPath()
-        ctx.arc(ex + sx, eyeY + sy, eyeR, 0, Math.PI * 2)
-        ctx.fillStyle = CONFIG.eyeColor
-        ctx.fill()
-        ctx.beginPath()
-        ctx.arc(ex + sx + eyeR * 0.3, eyeY + sy - eyeR * 0.3, eyeR * 0.25, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255,255,255,0.25)'
-        ctx.fill()
-      }
-    } else {
-      ctx.strokeStyle = CONFIG.eyeColor
-      ctx.lineWidth = lw
-      for (let side = -1; side <= 1; side += 2) {
-        ctx.beginPath()
-        ctx.arc(eyeSpacing * side, eyeY, eyeR * 0.8, 0.2, Math.PI - 0.2)
-        ctx.stroke()
-      }
-    }
-
-    // blush
-    for (let side = -1; side <= 1; side += 2) {
-      ctx.beginPath()
-      ctx.ellipse(eyeSpacing * side * 1.3, eyeY + headR * 0.2, headR * 0.1, headR * 0.05, 0, 0, Math.PI * 2)
-      ctx.fillStyle = CONFIG.blushColor
-      ctx.fill()
-    }
-
-    // mouth
-    const mouthY = headR * 0.3
-    const mouthW = headR * 0.22
-    const curve = phase.smileCurve * headR
-    ctx.strokeStyle = CONFIG.bodyColor
-    ctx.lineWidth = lw * 0.8
-    ctx.lineCap = 'round'
-    ctx.beginPath()
-    ctx.moveTo(-mouthW, mouthY)
-    ctx.quadraticCurveTo(0, mouthY + curve, mouthW, mouthY)
-    ctx.stroke()
-  }
-
-  function drawSleepingFace(headR, lw, phase) {
-    const eyeY = -headR * 0.1
-    const eyeSpacing = headR * 0.32
-    ctx.strokeStyle = CONFIG.eyeColor
-    ctx.lineWidth = lw * 0.8
-    ctx.lineCap = 'round'
-    for (let side = -1; side <= 1; side += 2) {
-      ctx.beginPath()
-      ctx.arc(eyeSpacing * side, eyeY, headR * 0.1, 0.3, Math.PI - 0.3)
-      ctx.stroke()
-    }
-    for (let side = -1; side <= 1; side += 2) {
-      ctx.beginPath()
-      ctx.ellipse(eyeSpacing * side * 1.3, eyeY + headR * 0.18, headR * 0.08, headR * 0.04, 0, 0, Math.PI * 2)
-      ctx.fillStyle = CONFIG.blushColor
-      ctx.fill()
-    }
-    const mouthY = headR * 0.28
-    ctx.beginPath()
-    ctx.moveTo(-headR * 0.08, mouthY)
-    ctx.quadraticCurveTo(0, mouthY + headR * 0.04, headR * 0.08, mouthY)
-    ctx.strokeStyle = CONFIG.bodyColor
-    ctx.lineWidth = lw * 0.6
-    ctx.stroke()
-    if (phase.glyphOpacity > 0.3) {
-      ctx.globalAlpha = 0.15
-      ctx.beginPath()
-      ctx.arc(0, -headR * 0.48, headR * 0.12, Math.PI, 0)
-      ctx.strokeStyle = CONFIG.glyphColor
-      ctx.lineWidth = lw * 0.6
-      ctx.stroke()
-      ctx.globalAlpha = 1
-    }
-  }
+  // ─── trail (voxel squares fading) ──────────────
 
   function drawTrail() {
     if (ch.sleeping) return
     const speed = Math.sqrt(ch.vx * ch.vx + ch.vy * ch.vy)
-    if (speed < 1) return
+    if (speed < 0.5) return
     for (let i = 0; i < ch.trail.length; i++) {
       const t = ch.trail[i]
-      const a = (i / ch.trail.length) * 0.08 * Math.min(speed / 3, 1)
-      ctx.beginPath()
-      ctx.arc(t.x, t.y, CONFIG.size * 0.12 * (i / ch.trail.length), 0, Math.PI * 2)
-      ctx.fillStyle = `rgba(220,38,38,${a})`
-      ctx.fill()
+      const a = (i / ch.trail.length) * 0.06 * Math.min(speed / 2, 1)
+      const s = 1 + (i / ch.trail.length) * 2
+      ctx.globalAlpha = a
+      ctx.fillStyle = RED
+      ctx.fillRect(t.x - s / 2, t.y - s / 2, s, s) // square trail
     }
+    ctx.globalAlpha = 1
   }
 
   // ─── update ────────────────────────────────────
@@ -465,12 +555,12 @@ export function createSpiritEngine(canvas) {
       const msg = PHRASES.phaseChange[curPhase]
       if (msg) {
         say(msg, 3)
-        spawnParticles(ch.x, ch.y - 6, 6, CONFIG.glyphColor)
+        spawnParticles(ch.x, ch.y - 10, 8, RED)
       }
       lastPhase = curPhase
     }
 
-    // pacing hints (every 20s check)
+    // pacing hints
     if (currentSlide && slideDwellTime - lastPacingHintTime > 20 && bubble.opacity <= 0) {
       const hint = getPacingHint(currentSlide.type, slideDwellTime)
       if (hint) {
@@ -485,6 +575,7 @@ export function createSpiritEngine(canvas) {
       ch.squashTarget = 1
       if (ch.birthTimer > 0.6 && ch.birthTimer < 0.7) {
         say(pick(PHRASES.birth), 3)
+        spawnParticles(ch.x, ch.y - 10, 6, GRAY)
       }
       if (ch.birthTimer > 1) ch.born = true
     }
@@ -504,7 +595,7 @@ export function createSpiritEngine(canvas) {
     ch.hopV *= 0.78
     ch.hopY += ch.hopV
 
-    // breath
+    // breath + float
     ch.breathPhase += dt * 2
     ch.floatPhase += dt * 0.8
 
@@ -524,12 +615,12 @@ export function createSpiritEngine(canvas) {
       }
       if (distMouse < CONFIG.wakeRadius && mouse.active) {
         ch.sleeping = false; ch.sleepTimer = 0
-        say(pick(PHRASES.wake)); ch.hopV = -2; ch.squashTarget = 1.15
+        say(pick(PHRASES.wake)); ch.hopV = -2.5; ch.squashTarget = 1.15
+        spawnParticles(ch.x, ch.y - 10, 4, GRAY)
       }
     } else {
       if (speed < 0.3 && bubble.opacity <= 0) ch.idleTimer += dt; else ch.idleTimer = 0
 
-      // idle mumble
       if (ch.idleTimer > 12 && Math.random() < 0.0015) {
         const phase = getCurrentPhase()
         const idlePhrases = PHRASES.idle[phase] || PHRASES.idle.newcomer
@@ -537,7 +628,6 @@ export function createSpiritEngine(canvas) {
         ch.idleTimer = 0
       }
 
-      // sleep
       ch.sleepTimer += dt
       if (ch.sleepTimer > CONFIG.sleepAfterIdle + Math.random() * 10) {
         ch.sleeping = true
@@ -546,7 +636,6 @@ export function createSpiritEngine(canvas) {
         say(pick(PHRASES.sleep), 2)
       }
 
-      // cursor
       const energy = currentSlide ? getBlockEnergy(currentSlide.block) : 0.8
       const cursorForce = CONFIG.cursorChaseForce * energy
       if (distMouse < CONFIG.cursorRadius && mouse.active) {
@@ -555,7 +644,9 @@ export function createSpiritEngine(canvas) {
         ch.vy += (dy / distMouse) * cursorForce
       } else {
         wpTimer += dt
-        if (wpTimer > 6 + Math.random() * 4 || Math.abs(ch.x - waypoint.x) < 15) newWaypoint()
+        if (wpTimer > 6 + Math.random() * 4 || Math.abs(ch.x - waypoint.x) < 20) {
+          newPerimeterWaypoint()
+        }
         const wx = waypoint.x - ch.x, wy = waypoint.y - ch.y
         const wd = Math.sqrt(wx * wx + wy * wy)
         const ws = CONFIG.wanderSpeed * energy
@@ -569,23 +660,29 @@ export function createSpiritEngine(canvas) {
     if (!ch.sleeping) ch.vy += CONFIG.gravity
     ch.x += ch.vx; ch.y += ch.vy
 
-    const m = CONFIG.size + 3
+    // facing direction
+    if (Math.abs(ch.vx) > 0.2) {
+      ch.facing = ch.vx > 0 ? 1 : -1
+    }
+
+    // boundary clamping
+    const m = 30
     if (ch.x < m) { ch.x = m; ch.vx *= -CONFIG.bounciness }
     if (ch.x > W - m) { ch.x = W - m; ch.vx *= -CONFIG.bounciness }
     if (ch.y < m) { ch.y = m; ch.vy *= -CONFIG.bounciness }
     if (ch.y > H - m) { ch.y = H - m; ch.vy *= -CONFIG.bounciness; ch.hopV = -0.8 }
 
     ch.legPhase += cs * 0.25
-    ch.tilt += (ch.vx * 0.04 - ch.tilt) * 0.06
+    ch.tilt += (ch.vx * 0.03 - ch.tilt) * 0.06
 
     // blink
     ch.blinkTimer += dt
     if (ch.blinkTimer > 3 + Math.random() * 4) { ch.blinkState = true; ch.blinkTimer = 0 }
-    if (ch.blinkState && ch.blinkTimer > 0.1) ch.blinkState = false
+    if (ch.blinkState && ch.blinkTimer > 0.12) ch.blinkState = false
 
     // trail
     ch.trail.push({ x: ch.x, y: ch.y })
-    if (ch.trail.length > 10) ch.trail.shift()
+    if (ch.trail.length > 12) ch.trail.shift()
 
     updateBubble()
     updateParticles()
@@ -598,6 +695,7 @@ export function createSpiritEngine(canvas) {
     ctx.clearRect(0, 0, W, H)
     drawTrail()
     drawParticles()
+    drawAmbientVoxels(ch.x, ch.y)
     drawZzz()
     drawCharacter()
     drawBubble(ch.x, ch.y + ch.hopY)
@@ -615,23 +713,19 @@ export function createSpiritEngine(canvas) {
     animId = requestAnimationFrame(loop)
   }
 
-  // ─── resize ────────────────────────────────────
-
   function resize() {
     W = canvas.width = window.innerWidth
     H = canvas.height = window.innerHeight
   }
 
-  // ─── click handler ─────────────────────────────
-
   function handleClick(e) {
     const dx = e.clientX - ch.x, dy = e.clientY - (ch.y + ch.hopY)
     const dist = Math.sqrt(dx * dx + dy * dy)
-    if (dist < CONFIG.size + 20) {
+    if (dist < 35) {
       ch.clickCount++; ch.clickReset = 0
-      ch.squashTarget = 0.7; ch.hopV = -2.5
+      ch.squashTarget = 0.7; ch.hopV = -3
       ch.idleTimer = 0; ch.sleepTimer = 0
-      spawnParticles(ch.x, ch.y - 4, 4, CONFIG.glyphColor)
+      spawnParticles(ch.x, ch.y - 10, 5, RED)
       if (ch.sleeping) {
         ch.sleeping = false; ch.sleepTimer = 0
         say(pick(PHRASES.wake)); ch.squashTarget = 1.2; return
@@ -649,8 +743,6 @@ export function createSpiritEngine(canvas) {
     }
   }
 
-  // ─── mouse ─────────────────────────────────────
-
   function handleMouseMove(e) {
     mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true
   }
@@ -661,8 +753,10 @@ export function createSpiritEngine(canvas) {
   return {
     start() {
       resize()
-      ch.x = W * 0.65; ch.y = H * 0.55
-      newWaypoint()
+      // start on right edge
+      ch.x = W - CONFIG.perimeterMargin - 20
+      ch.y = H * 0.6
+      newPerimeterWaypoint()
       window.addEventListener('mousemove', handleMouseMove)
       window.addEventListener('mouseleave', handleMouseLeave)
       window.addEventListener('resize', resize)
@@ -688,19 +782,10 @@ export function createSpiritEngine(canvas) {
       if (changed) {
         slideDwellTime = 0
         lastPacingHintTime = 0
-
-        // wake on slide change
-        if (ch.sleeping) {
-          ch.sleeping = false
-          ch.sleepTimer = 0
-        }
-
-        // small reaction
-        ch.hopV = -1.5
+        if (ch.sleeping) { ch.sleeping = false; ch.sleepTimer = 0 }
+        ch.hopV = -2
         ch.squashTarget = 0.85
-        spawnParticles(ch.x, ch.y - 4, 3, CONFIG.glyphColor)
-
-        // contextual remark
+        spawnParticles(ch.x, ch.y - 10, 4, RED)
         if (bubble.opacity <= 0.1) {
           const remark = getSlideRemark(slide)
           if (remark) say(remark, 2.5)
@@ -709,7 +794,6 @@ export function createSpiritEngine(canvas) {
     },
 
     setSessionTime(t) { sessionTime = t },
-
     getCharPos() { return { x: ch.x, y: ch.y } },
   }
 }
