@@ -77,9 +77,6 @@ const slides = [
     type: "recap",
     title: "WS01: Prompt Engineering",
     speaker: "Александр Поваляев",
-    date: "19 января",
-    tagline: "Поведение > технологии",
-    tools: ["ChatGPT", "Claude", "Gemini", "DeepSeek", "Perplexity"],
     items: [
       "Модели — это не магия, а интерфейсы с ограничениями",
       "Каждая модель видит мир по-своему (GPT, Claude, Gemini, DeepSeek)",
@@ -97,9 +94,6 @@ const slides = [
     type: "recap",
     title: "WS02: Context Engineering",
     speaker: "Сергей Хабаров",
-    date: "26 января",
-    tagline: "Контекст > промпт",
-    tools: ["Claude Projects", "GPT Projects", "NotebookLM", "Custom Instructions"],
     items: [
       "Контекст — это всё, что нужно знать, чтобы помочь именно тебе",
       "Контекст-алхимия: смешивай ингредиенты и смотри, что получится",
@@ -108,27 +102,6 @@ const slides = [
       "Кривая обучения: энтузиазм → кризис реальности → интеграция",
     ],
     quote: "Если у кого-то есть «зачем», тот выдержит почти любое «как».",
-  },
-
-  {
-    id: 'ws03-recap',
-    block: 1,
-    blockTitle: "Recap",
-    type: "recap",
-    title: "WS03: Mind Engineering",
-    speaker: "Анна Лозицкая",
-    date: "2 февраля",
-    tagline: "Осознанность > скорость",
-    slidesUrl: "https://w26-ws03-ethics.netlify.app",
-    items: [
-      "Эпидемия одиночества: недостаток реальных связей опаснее курения 15 сигарет в день",
-      "AI — машина по предсказанию текста, не думающая история",
-      "Этика AI: спектр от e/acc до doomer — важно осознанно выбрать позицию",
-      "12-point safety framework для AI-коуча от Jocelyn Skillman",
-      "Phil Stutz Framework: тело, люди, отношения с собой",
-    ],
-    quote: "Ты хорошо умеешь думать о чувствах, но реже быть в них.",
-    tools: ["ChatGPT Projects", "Hume AI", "Monologue", "Gemini"],
   },
 
   {
