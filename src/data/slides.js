@@ -195,6 +195,24 @@ const slides = [
     ],
   },
 
+  {
+    id: 'poll-results-1',
+    block: 0,
+    blockTitle: "Opening",
+    type: "poll-results",
+    title: "Результаты: как вы себя чувствуете",
+    subtitle: "45 из 56 участников (80%)",
+    total: 45,
+    voxel: "/voxels/slide1-builder.html",
+    results: [
+      { svg: "calm", label: "Calm", desc: "Начинаю разбираться", count: 22, pct: 49 },
+      { svg: "excited", label: "Excited", desc: "Хочу больше", count: 13, pct: 29 },
+      { svg: "confused", label: "Confused", desc: "Пока не понимаю, куда это все", count: 8, pct: 18 },
+      { svg: "overwhelmed", label: "Overwhelmed", desc: "Слишком много всего", count: 2, pct: 4 },
+    ],
+    note: "Почти половина группы уже в спокойном рабочем режиме. Это хороший сигнал к четвертой неделе.",
+  },
+
   // ═══════════════════════════════════════════
   // BLOCK 2: MINDSET SHIFT
   // ═══════════════════════════════════════════
