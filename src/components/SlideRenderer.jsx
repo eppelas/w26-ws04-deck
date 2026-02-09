@@ -1,13 +1,4 @@
-function VoxelScene({ src }) {
-  return (
-    <iframe
-      src={src}
-      className="w-full h-full border-0"
-      style={{ pointerEvents: 'none' }}
-      title="Voxel Scene"
-    />
-  )
-}
+import VoxelScene from './VoxelScene'
 
 function WithVoxel({ slide, children }) {
   if (!slide.voxel) return children;
