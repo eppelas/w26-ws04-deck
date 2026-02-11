@@ -14,6 +14,7 @@ const icons = {
 export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isSelected, style }, ref) => {
   const Icon = icons[node.type] || Box
   const isLevel = node.isLevel
+  const isSecondary = node.secondary
 
   const handleCardClick = () => {
     onSelect(node)
@@ -25,7 +26,7 @@ export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isS
         ref={ref}
         style={style}
         onClick={handleCardClick}
-        className={`absolute w-72 flex flex-col overflow-hidden group cursor-pointer select-none
+        className={`absolute w-80 flex flex-col overflow-hidden group cursor-pointer select-none
           transition-all duration-500 rounded-2xl border-2
           ${isSelected ? 'bg-slate-800 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.4)] scale-105 z-50 border-red-500/50' : 'bg-slate-900 hover:bg-slate-800 shadow-xl border-slate-700/50 z-10'}
         `}
@@ -38,8 +39,8 @@ export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isS
           <div className="flex gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-red-400 opacity-70"></div></div>
           <div className="text-[10px] font-mono uppercase font-bold text-slate-400">{node.timeEstimate}</div>
         </div>
-        <div className="p-5">
-          <div className="mb-2 text-white font-sans font-extrabold text-lg tracking-tight">{node.title}</div>
+        <div className="p-8 min-h-[280px] flex flex-col justify-center">
+          <div className="mb-3 text-white font-sans font-extrabold text-lg tracking-tight">{node.title}</div>
           <div className="text-sm leading-relaxed text-slate-400 font-medium">{node.description}</div>
         </div>
       </div>
@@ -53,7 +54,7 @@ export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isS
       onClick={handleCardClick}
       className={`absolute w-80 flex flex-col overflow-hidden group cursor-pointer select-none
         backdrop-blur-xl transition-all duration-500 border border-white/20 rounded-3xl
-        ${isSelected ? 'bg-white/80 shadow-[0_20px_40px_-10px_rgba(139,92,246,0.2)] scale-105 z-50' : 'bg-white/40 hover:bg-white/60 shadow-lg border-white/40 z-10'}
+        ${isSelected ? 'bg-white/80 shadow-[0_20px_40px_-10px_rgba(139,92,246,0.2)] scale-105 z-50' : isSecondary ? 'bg-white/30 hover:bg-white/50 shadow-md border-white/30 z-[5]' : 'bg-white/40 hover:bg-white/60 shadow-lg border-white/40 z-10'}
       `}
     >
       <div

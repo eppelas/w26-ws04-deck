@@ -8,9 +8,9 @@ import { RotateCcw, ArrowLeft, Plus, Minus } from 'lucide-react'
 
 const INITIAL_OFFSET_X = 200
 const INITIAL_OFFSET_Y = 150
-const GRID_X_SPACING = 240
-const GRID_Y_SPACING = 180
-const STORAGE_KEY = 'interaction_map_nodes_v11'
+const GRID_X_SPACING = 385
+const GRID_Y_SPACING = 380
+const STORAGE_KEY = 'interaction_map_nodes_v17'
 
 export default function InteractionMap({ onBack }) {
   const [nodes, setNodes] = useState(() => {
@@ -172,8 +172,8 @@ export default function InteractionMap({ onBack }) {
               width: `${contentW}px`,
               height: `${contentH}px`,
               backgroundImage: `
-                linear-gradient(to right, rgba(139,92,246,0.08) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(139,92,246,0.10) 1px, transparent 1px)
+                linear-gradient(to right, rgba(139,92,246,0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(139,92,246,0.15) 1px, transparent 1px)
               `,
               backgroundSize: `${GRID_X_SPACING}px ${GRID_Y_SPACING}px`,
               backgroundPosition: `${INITIAL_OFFSET_X - 40}px ${INITIAL_OFFSET_Y - 30}px`

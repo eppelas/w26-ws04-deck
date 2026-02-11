@@ -9,7 +9,12 @@ export function WobblyArrow({ startX, startY, endX, endY }) {
 
   return (
     <svg className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-visible z-0" style={{ minWidth: '100%', minHeight: '100%' }}>
-      <path d={pathD} stroke="#8b5cf6" strokeWidth={3} fill="none" strokeLinecap="round" className="transition-all duration-500" style={{ opacity: 0.15 }} />
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6" opacity="0.6" />
+        </marker>
+      </defs>
+      <path d={pathD} stroke="#8b5cf6" strokeWidth={2.5} fill="none" strokeLinecap="round" markerEnd="url(#arrowhead)" className="transition-all duration-500" style={{ opacity: 0.25 }} />
       <circle r={3} fill="#a78bfa">
         <animateMotion dur="3s" repeatCount="indefinite" path={pathD} keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
         <animate attributeName="opacity" values="0;1;1;0" dur="3s" repeatCount="indefinite" />
