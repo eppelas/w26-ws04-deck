@@ -183,7 +183,7 @@ export const SCHEMA_NODES = [
     connections: ['img-editing'],
     tools: ['Recraft', 'Imagen 4', 'Ideogram', 'Pencil'],
     timeEstimate: 'Level 3',
-    x: 2, y: 2,
+    x: 2, y: 2.2,
     toolDetails: [
       { name: 'Recraft', url: 'https://recraft.ai', category: 'Vector/Brand', description: 'Infinite canvas для генерации векторов и Brand sets. SVG export. Сохранённые стили и палитры для серий.', bestFor: 'SVG icons, consistent brand identity, vector sets.' },
       { name: 'Imagen 4', url: 'https://labs.google/fx/tools/image-fx', category: 'Typography', description: 'Google. Лидер типографики: читаемый текст в картинках. 3 варианта (Fast/Standard/Ultra). Лучший для постеров, обложек, дизайна с текстом.', bestFor: 'Text in images, posters, covers, typography.' },
@@ -221,7 +221,7 @@ export const SCHEMA_NODES = [
     connections: ['img-advanced'],
     tools: ['Nano Banana Pro', 'Flux Kontext', 'Seed Edit', 'Krea'],
     timeEstimate: 'Level 4',
-    x: 2, y: 3,
+    x: 2, y: 3.3,
     toolDetails: [
       { name: 'Nano Banana Pro', url: 'https://fusara.ai', category: 'Editing Leader', description: 'Google. Лидер editing/inpainting. Работает с JSON: попиксельный контроль, координаты, углы поворота, размеры. Отлично понимает цифры и пространственные инструкции.', bestFor: 'JSON-based editing, precise modifications, text/numbers in images.' },
       { name: 'Flux Kontext', url: 'https://blackforestlabs.ai', category: 'Editing', description: 'Editing specialist из семейства Flux. In-context editing с сохранением character/style consistency. Итеративные правки.', bestFor: 'In-context editing, character consistency, iterative modifications.' },
@@ -250,13 +250,12 @@ export const SCHEMA_NODES = [
     description: 'Тренировка LoRA, кастомные чекпойнты.',
     details: 'Тренировка LoRA под свой стиль/персонажа/объект. Скачивание и использование чекпойнтов. Максимальная консистентность. Запуск — через ComfyUI (см. Local & Cloud Compute).',
     connections: ['infra'],
-    tools: ['CivitAI', 'Krea', 'Weights.com'],
+    tools: ['CivitAI', 'Krea'],
     timeEstimate: 'Level 5',
-    x: 2, y: 4,
+    x: 2, y: 4.5,
     toolDetails: [
       { name: 'CivitAI', url: 'https://civitai.com', category: 'Model Hub', description: 'Хаб LoRA, чекпойнтов. Тренировка, скачивание, шаринг. Готовые стили и персонажи.', bestFor: 'Finding/training LoRA, checkpoints.' },
       { name: 'Krea (LoRA Training)', url: 'https://www.krea.ai', category: 'Cloud Training', description: 'Обучение LoRA в облаке (платный тариф). Удобный UX, триггер-слова. Применение прямо в Krea.', bestFor: 'Cloud LoRA training, easy UX.' },
-      { name: 'Weights.com', url: 'https://weights.com', category: 'Cloud Training', description: 'Обучение LoRA в облаке. Скачивание или использование в совместимых приложениях.', bestFor: 'LoRA training, sharing, reuse.' },
       { name: 'Mage.Space', url: 'https://mage.space', category: 'SD Hub', description: 'Много SD/SDXL чекпойнтов и LoRA; бесплатная очередь.', bestFor: 'SD/SDXL models, free queue.' },
       { name: 'SeaArt.ai', url: 'https://seaart.ai', category: 'Model Hub', description: 'Большая библиотека моделей/LoRA; дневные кредиты.', bestFor: 'Finding LoRA, daily credits.' },
       { name: 'Tensor.art', url: 'https://tensor.art', category: 'Model Hub', description: 'Хаб SD/SDXL/LoRA; быстрые тесты трендовых моделей.', bestFor: 'Testing trending models.' },
@@ -265,7 +264,7 @@ export const SCHEMA_NODES = [
     tips: [
       {
         title: 'Типы LoRA и когда использовать',
-        text: `Style LoRA: самый эффективный, фиксирует визуальный стиль. Character LoRA: лучший для лиц и персонажей. Object LoRA: повторяет один и тот же предмет. Тренировка: 12-38 фото с разных углов при одинаковом свете. Платформы: Krea (платно), Weights.com, ComfyUI (локально).`
+        text: `Style LoRA: самый эффективный, фиксирует визуальный стиль. Character LoRA: лучший для лиц и персонажей. Object LoRA: повторяет один и тот же предмет. Тренировка: 12-38 фото с разных углов при одинаковом свете. Платформы: Krea (платно), ComfyUI (локально).`
       }
     ]
   },
@@ -300,7 +299,7 @@ export const SCHEMA_NODES = [
     connections: ['vid-editing'],
     tools: ['HeyGen', 'Captions.ai', 'Higgsfield'],
     timeEstimate: 'Level 3',
-    x: 3, y: 2,
+    x: 3, y: 2.2,
     toolDetails: [
       { name: 'HeyGen', url: 'https://heygen.com', category: 'Avatars', description: 'Цифровые аватары: фото + голос = говорящий персонаж. Есть API и работа через скрипты — можно автоматизировать создание большого количества видео.', bestFor: 'Digital avatars, talking heads, batch video via API.' },
       { name: 'Captions.ai', url: 'https://www.captions.ai', category: 'Video Tool', description: 'Создание виральных видео с автоматическим переводом и коррекцией взгляда в камеру.', bestFor: 'Viral videos, auto-translation, eye contact fix.' },
@@ -316,7 +315,7 @@ export const SCHEMA_NODES = [
     connections: ['vid-production'],
     tools: ['Runway', 'Kling', 'Topaz', 'Florafauna'],
     timeEstimate: 'Level 4',
-    x: 3, y: 3,
+    x: 3, y: 3.3,
     toolDetails: [
       { name: 'Runway Gen-4', url: 'https://runwayml.com', category: 'Platform', description: 'Full editor (tracking, inpaint) + Generation. Editing tools are best in class.', bestFor: 'Professional control, Motion Brush.' },
       { name: 'Kling', url: 'https://klingai.com', category: 'Video Editing', description: 'Помимо генерации — мощные инструменты редактирования видео, эффекты, lip sync.', bestFor: 'Video editing, effects, lip sync.' },
@@ -333,7 +332,7 @@ export const SCHEMA_NODES = [
     connections: ['infra'],
     tools: ['Shotstack', 'Creatomate', 'Pictory'],
     timeEstimate: 'Level 5',
-    x: 3, y: 4,
+    x: 3, y: 4.5,
     toolDetails: [
       { name: 'Shotstack', url: 'https://shotstack.io', category: 'Video API', description: 'Программный монтаж через API. JSON → готовое видео. Один шаблон → много вариаций. Титры, плашки, склейка. Удобен для огромных объёмов.', bestFor: 'Batch video production, API automation, templates.' },
       { name: 'Creatomate', url: 'https://creatomate.com', category: 'Video API', description: 'Отправить сценарий и структуру → видео собирается само. Как символы в Figma: меняешь в одном месте — меняется везде. Гибче Shotstack для сложных сценариев.', bestFor: 'Template-based video, programmatic editing, batch rendering.' },
@@ -383,7 +382,7 @@ export const SCHEMA_NODES = [
     connections: ['music-sounddesign'],
     tools: ['ElevenLabs', 'MiniMax', 'Cartesia', 'OpenVoice'],
     timeEstimate: 'Level 3',
-    x: 4, y: 2,
+    x: 4, y: 2.2,
     toolDetails: [
       { name: 'ElevenLabs', url: 'https://elevenlabs.io', category: 'Speech (TTS)', description: 'Лидер TTS: клоны голосов, эмоции, эффекты. Озвучка роликов, дубляж, подкасты. Чувствительность к пунктуации/разметке.', bestFor: 'Dubbing, audiobooks, voice cloning, podcasts.' },
       { name: 'MiniMax', url: 'https://minimax.io/audio', category: 'Voice', description: 'Бесплатные кредиты для клонирования голоса, voice design, text to audio.', bestFor: 'Free voice cloning, voice design.' },
@@ -400,7 +399,7 @@ export const SCHEMA_NODES = [
     connections: ['music-agents', 'infra'],
     tools: ['Suno', 'Demucs', 'Stable Audio'],
     timeEstimate: 'Level 4',
-    x: 4, y: 3,
+    x: 4, y: 3.5,
     toolDetails: [
       { name: 'Suno (Multi-layer)', url: 'https://suno.com', category: 'Editing', description: 'Многослойное редактирование: отдельно вокал, инструменты, аранжировка. Можно перегенерировать один слой, не трогая остальные.', bestFor: 'Layer-by-layer music editing, vocal/instrument control.' },
       { name: 'Demucs', url: 'https://github.com/facebookresearch/demucs', category: 'Open Source', description: 'Разделение треков на дорожки (стемы): вокал, бас, ударные, прочее.', bestFor: 'Stem separation, remixing.' },
@@ -416,7 +415,7 @@ export const SCHEMA_NODES = [
     connections: [],
     tools: ['Cartesia', 'ElevenLabs', 'OpenVoice'],
     timeEstimate: 'Level 5',
-    x: 4, y: 4,
+    x: 4, y: 4.7,
     toolDetails: [
       { name: 'Cartesia', url: 'https://cartesia.ai', category: 'API', description: 'Real-time голос через API. Ultra-low latency.', bestFor: 'Real-time voice agents in apps.' },
       { name: 'ElevenLabs', url: 'https://elevenlabs.io', category: 'Conversational AI', description: 'Conversational AI agents с клонированным голосом.', bestFor: 'Voice agents, conversational AI.' },
@@ -431,13 +430,14 @@ export const SCHEMA_NODES = [
     description: 'Clean logos, icons, and consistent assets.',
     details: 'Moving away from raster noise to clean, usable design assets and consistent styling.',
     connections: ['design-3d'],
-    tools: ['Recraft', 'Ideogram', 'Krea'],
+    tools: ['Recraft', 'Ideogram', 'Krea', 'Pencil'],
     timeEstimate: '10 Hours',
-    x: 5, y: 2,
+    x: 5, y: 1.7,
     toolDetails: [
       { name: 'Recraft', url: 'https://recraft.ai', category: 'Vector/Brand', description: 'Infinite canvas for Vector generation and Brand sets.', bestFor: 'SVG icons, consistent brand identity.' },
       { name: 'Ideogram', url: 'https://ideogram.ai', category: 'Typography', description: 'Leader in rendering text inside images.', bestFor: 'T-shirt designs, posters with text.' },
       { name: 'Krea.ai', url: 'https://www.krea.ai', category: 'Realtime Canvas', description: 'Realtime generation and upscaling.', bestFor: 'Interactive design, Upscaling.' },
+      { name: 'Pencil', url: 'https://pencil.li', category: 'UI Design', description: 'AI-расширение для дизайна UI/UX прямо в IDE. Генерация интерфейсов, компонентов, макетов.', bestFor: 'UI/UX design, component generation, prototyping.' },
     ]
   },
   {
@@ -449,7 +449,7 @@ export const SCHEMA_NODES = [
     connections: [],
     tools: ['Spline', 'Formia'],
     timeEstimate: 'Project Based',
-    x: 5, y: 3,
+    x: 5, y: 3.2,
     toolDetails: [
       { name: 'Spline', url: 'https://spline.design', category: '3D Design', description: 'Web-based 3D design with AI text-to-3D.', bestFor: 'Web 3D assets, simple models.' },
       { name: 'Formia.so', url: 'https://formia.so', category: 'SVG to 3D', description: 'Instant conversion of 2D vectors to 3D meshes.', bestFor: 'Logos to 3D.' }
@@ -466,7 +466,7 @@ export const SCHEMA_NODES = [
     connections: ['coding-ide'],
     tools: ['Google Build', 'Lovable', 'Replit', 'n8n', 'Make'],
     timeEstimate: 'Hours to MVP',
-    x: 1, y: 2,
+    x: 1, y: 2.3,
     toolDetails: [
       { name: 'Google Build', url: 'https://aistudio.google.com/apps', category: 'Prompt-to-App', description: 'Самый простой вход в вайб-кодинг. В браузере, видишь результат сразу. Лучше понимает красивый дизайн. Можно скачать код или расшарить ссылку — другие смогут на её основе создавать свои инструменты. Галерея чужих проектов как inspiration.', bestFor: 'Быстрый вход, быстрые итерации, шаринг.' },
       { name: 'Lovable', url: 'https://lovable.dev', category: 'Prompt-to-App', description: 'Rapid full-stack prototyping with Supabase integration.', bestFor: 'Scaffolding full-stack foundations to export later.' },
@@ -489,7 +489,7 @@ export const SCHEMA_NODES = [
     connections: ['coding-terminal', 'coding-agents'],
     tools: ['Cursor', 'Windsurf'],
     timeEstimate: 'Career Skill',
-    x: 1, y: 3,
+    x: 1, y: 3.5,
     toolDetails: [
       { name: 'Cursor', url: 'https://cursor.com', category: 'AI-First IDE', description: 'Fork of VS Code. Deep context control.', bestFor: 'Pro dev, Refactoring, Scalable projects.' },
       { name: 'Windsurf', url: 'https://codeium.com/windsurf', category: 'Flow IDE', description: 'Focuses on "Flow" and deep agentic behavior (Cascade).', bestFor: 'Automating routine, mixed teams.' },
@@ -513,7 +513,7 @@ export const SCHEMA_NODES = [
     connections: [],
     tools: ['Claude Code', 'Aider', 'GitHub Copilot CLI'],
     timeEstimate: 'Deep Skill',
-    x: 1, y: 4,
+    x: 1, y: 4.8,
     toolDetails: [
       { name: 'Claude Code', url: 'https://docs.anthropic.com/en/docs/claude-code', category: 'CLI Agent', description: 'Conversational interface for granular codebase control.', bestFor: 'Complex refactoring, debugging.' },
     ]
@@ -527,7 +527,7 @@ export const SCHEMA_NODES = [
     connections: [],
     tools: ['MCP', 'LangGraph', 'CrewAI', 'OpenAI Agents SDK'],
     timeEstimate: 'Level 4-5',
-    x: 1.5, y: 3.5,
+    x: 1.5, y: 4.2,
     toolDetails: [
       { name: 'MCP', url: 'https://modelcontextprotocol.io', category: 'Protocol', description: 'Model Context Protocol — стандарт подключения AI к внешним инструментам и данным. Работает в Cursor, Windsurf, Claude.', bestFor: 'Custom integrations, tool orchestration.' },
       { name: 'LangGraph', url: 'https://langchain-ai.github.io/langgraph/', category: 'Agent Framework', description: 'Фреймворк для stateful мульти-агентных систем с ветвлением, циклами и error recovery. Часть экосистемы LangChain.', bestFor: 'Complex branching agents, long-running workflows.' },
@@ -550,7 +550,7 @@ export const SCHEMA_NODES = [
     connections: ['img-advanced', 'vid-production', 'music-agents'],
     tools: ['ComfyUI', 'RunPod', 'HuggingFace', 'CivitAI'],
     timeEstimate: 'Lifetime Mastery',
-    x: 5, y: 4,
+    x: 2.5, y: 5.5,
     toolDetails: [
       { name: 'ComfyUI', url: 'https://github.com/comfyanonymous/ComfyUI', category: 'Framework', description: 'Нодовая среда для GenAI: image, video, audio пайплайны. Каждый блок — одно действие. Комбинирование разных моделей. Весь workflow = JSON-файл, который можно шарить.', bestFor: 'Complex pipelines, mixing models, offline work, batch processing.' },
       { name: 'Fooocus', url: 'https://github.com/lllyasviel/Fooocus', category: 'Local Interface', description: 'Простейший локальный интерфейс для SDXL. Для тех, кому ComfyUI слишком сложен.', bestFor: 'Beginners wanting local privacy, simple SDXL.' },

@@ -8,9 +8,9 @@ import { RotateCcw, ArrowLeft, Plus, Minus } from 'lucide-react'
 
 const INITIAL_OFFSET_X = 200
 const INITIAL_OFFSET_Y = 150
-const GRID_X_SPACING = 480
-const GRID_Y_SPACING = 320
-const STORAGE_KEY = 'interaction_map_nodes_v10'
+const GRID_X_SPACING = 240
+const GRID_Y_SPACING = 180
+const STORAGE_KEY = 'interaction_map_nodes_v11'
 
 export default function InteractionMap({ onBack }) {
   const [nodes, setNodes] = useState(() => {
@@ -104,7 +104,7 @@ export default function InteractionMap({ onBack }) {
       const cardsH = (Math.max(...ys) + CARD_H) * scale
       const offsetX = CANVAS_PAD * scale
       const offsetY = CANVAS_PAD * scale
-      container.scrollLeft = offsetX + (cardsW - vw) / 2
+      container.scrollLeft = offsetX + (cardsW - vw) * 0.35
       container.scrollTop = offsetY + (cardsH - vh) / 2
     }
     requestAnimationFrame(() => requestAnimationFrame(center))
@@ -172,8 +172,8 @@ export default function InteractionMap({ onBack }) {
               width: `${contentW}px`,
               height: `${contentH}px`,
               backgroundImage: `
-                linear-gradient(to right, rgba(139,92,246,0.04) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(139,92,246,0.06) 1px, transparent 1px)
+                linear-gradient(to right, rgba(139,92,246,0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(139,92,246,0.10) 1px, transparent 1px)
               `,
               backgroundSize: `${GRID_X_SPACING}px ${GRID_Y_SPACING}px`,
               backgroundPosition: `${INITIAL_OFFSET_X - 40}px ${INITIAL_OFFSET_Y - 30}px`
