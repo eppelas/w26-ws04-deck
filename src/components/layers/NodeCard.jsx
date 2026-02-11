@@ -15,13 +15,9 @@ export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isS
   const Icon = icons[node.type] || Box
   const isLevel = node.isLevel
 
-  const handleCardClick = (e) => {
-    const target = e.target
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
+  const handleCardClick = () => {
     onSelect(node)
   }
-
-  const handleInputClick = (e) => e.stopPropagation()
 
   if (isLevel) {
     return (
@@ -29,7 +25,7 @@ export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isS
         ref={ref}
         style={style}
         onClick={handleCardClick}
-        className={`absolute w-72 flex flex-col overflow-hidden group
+        className={`absolute w-72 flex flex-col overflow-hidden group cursor-pointer select-none
           transition-all duration-500 rounded-2xl border-2
           ${isSelected ? 'bg-slate-800 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.4)] scale-105 z-50 border-red-500/50' : 'bg-slate-900 hover:bg-slate-800 shadow-xl border-slate-700/50 z-10'}
         `}
@@ -37,13 +33,14 @@ export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isS
         <div
           className="h-7 w-full cursor-grab active:cursor-grabbing flex items-center justify-between px-4 border-b border-white/10"
           onMouseDown={(e) => onDragStart(e, node.id)}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="flex gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-red-400 opacity-70"></div></div>
           <div className="text-[10px] font-mono uppercase font-bold text-slate-400">{node.timeEstimate}</div>
         </div>
         <div className="p-5">
-          <input type="text" value={node.title} onClick={handleInputClick} onChange={(e) => onUpdate(node.id, 'title', e.target.value)} className="bg-transparent w-full focus:outline-none mb-2 text-white font-sans font-extrabold text-lg tracking-tight" />
-          <textarea value={node.description} onClick={handleInputClick} onChange={(e) => onUpdate(node.id, 'description', e.target.value)} className="bg-transparent w-full resize-none focus:outline-none h-12 text-sm leading-relaxed text-slate-400 font-medium" />
+          <div className="mb-2 text-white font-sans font-extrabold text-lg tracking-tight">{node.title}</div>
+          <div className="text-sm leading-relaxed text-slate-400 font-medium">{node.description}</div>
         </div>
       </div>
     )
@@ -54,7 +51,7 @@ export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isS
       ref={ref}
       style={style}
       onClick={handleCardClick}
-      className={`absolute w-80 flex flex-col overflow-hidden group
+      className={`absolute w-80 flex flex-col overflow-hidden group cursor-pointer select-none
         backdrop-blur-xl transition-all duration-500 border border-white/20 rounded-3xl
         ${isSelected ? 'bg-white/80 shadow-[0_20px_40px_-10px_rgba(139,92,246,0.2)] scale-105 z-50' : 'bg-white/40 hover:bg-white/60 shadow-lg border-white/40 z-10'}
       `}
@@ -62,6 +59,7 @@ export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isS
       <div
         className={`h-8 w-full cursor-grab active:cursor-grabbing flex items-center justify-between px-4 border-b border-black/5 ${isSelected ? 'bg-purple-500/10 text-purple-600' : 'bg-transparent text-gray-400'}`}
         onMouseDown={(e) => onDragStart(e, node.id)}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div></div>
         <div className="text-[10px] font-mono uppercase font-bold opacity-70">{node.type}</div>
@@ -70,11 +68,11 @@ export const NodeCard = forwardRef(({ node, onSelect, onUpdate, onDragStart, isS
         <div className="flex items-start gap-3 mb-4">
           <div className="mt-1 text-purple-500"><Icon className="w-5 h-5" /></div>
           <div className="flex-1 min-w-0">
-            <input type="text" value={node.title} onClick={handleInputClick} onChange={(e) => onUpdate(node.id, 'title', e.target.value)} className="bg-transparent w-full focus:outline-none mb-1 text-slate-800 font-sans font-bold" />
+            <div className="mb-1 text-slate-800 font-sans font-bold">{node.title}</div>
             <div className="text-[10px] uppercase tracking-wider opacity-60 text-slate-500 font-medium">{node.timeEstimate}</div>
           </div>
         </div>
-        <textarea value={node.description} onClick={handleInputClick} onChange={(e) => onUpdate(node.id, 'description', e.target.value)} className="bg-transparent w-full resize-none focus:outline-none h-16 text-sm leading-relaxed mb-4 text-slate-500 font-medium" />
+        <div className="text-sm leading-relaxed mb-4 text-slate-500 font-medium">{node.description}</div>
       </div>
     </div>
   )

@@ -6,22 +6,25 @@ import { WobblyArrow } from './WobblyArrow'
 import { CustomCursor } from './CustomCursor'
 import { RotateCcw, ArrowLeft } from 'lucide-react'
 
-const INITIAL_OFFSET_X = 100
+const INITIAL_OFFSET_X = 200
 const INITIAL_OFFSET_Y = 150
 const GRID_X_SPACING = 380
 const GRID_Y_SPACING = 320
-const STORAGE_KEY = 'interaction_map_nodes_v3'
+const STORAGE_KEY = 'interaction_map_nodes_v8'
 
 export default function InteractionMap({ onBack }) {
   const [nodes, setNodes] = useState(() => {
+    let savedPositions = {}
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved) return JSON.parse(saved)
+      if (saved) {
+        JSON.parse(saved).forEach(n => { savedPositions[n.id] = { posX: n.posX, posY: n.posY } })
+      }
     } catch (e) { console.warn(e) }
     return SCHEMA_NODES.map(node => ({
       ...node,
-      posX: INITIAL_OFFSET_X + (node.x || 0) * GRID_X_SPACING + (Math.random() * 10 - 5),
-      posY: INITIAL_OFFSET_Y + (node.y || 0) * GRID_Y_SPACING + (Math.random() * 10 - 5)
+      posX: savedPositions[node.id]?.posX ?? (INITIAL_OFFSET_X + (node.x || 0) * GRID_X_SPACING + (Math.random() * 10 - 5)),
+      posY: savedPositions[node.id]?.posY ?? (INITIAL_OFFSET_Y + (node.y || 0) * GRID_Y_SPACING + (Math.random() * 10 - 5))
     }))
   })
 
@@ -30,7 +33,7 @@ export default function InteractionMap({ onBack }) {
   }, [nodes])
 
   const [selectedNode, setSelectedNode] = useState(null)
-  const [scale, setScale] = useState(0.85)
+  const [scale, setScale] = useState(0.55)
   const [isDragging, setIsDragging] = useState(false)
   const [draggedNodeId, setDraggedNodeId] = useState(null)
   const containerRef = useRef(null)
@@ -80,6 +83,28 @@ export default function InteractionMap({ onBack }) {
     container.addEventListener('wheel', onWheel, { passive: false })
     return () => container.removeEventListener('wheel', onWheel)
   }, [])
+
+  // Compute content bounds for proper scrollable area
+  const CARD_W = 320, CARD_H = 200, PADDING = 200
+  const xs = nodes.map(n => n.posX || 0)
+  const ys = nodes.map(n => n.posY || 0)
+  const contentW = (Math.max(...xs) + CARD_W + PADDING) 
+  const contentH = (Math.max(...ys) + CARD_H + PADDING)
+
+  // Center horizontally, stick to top on mount
+  useEffect(() => {
+    const center = () => {
+      const container = containerRef.current
+      if (!container || nodes.length === 0) return
+      const scaledW = contentW * scale
+      const vw = container.clientWidth
+      container.scrollLeft = Math.max(0, (scaledW - vw) / 2)
+      container.scrollTop = 0
+    }
+    requestAnimationFrame(() => requestAnimationFrame(center))
+    const t = setTimeout(center, 150)
+    return () => clearTimeout(t)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (isDragging) {
@@ -132,26 +157,29 @@ export default function InteractionMap({ onBack }) {
         onClick={handleBackgroundClick}
         data-bg="true"
       >
-        <div
-          className="relative min-w-[3500px] min-h-[3000px] w-full h-full transform-origin-top-left transition-transform duration-75 ease-linear"
-          style={{ transform: `scale(${scale})` }}
-          data-bg="true"
-        >
-          <div className="absolute inset-0 pointer-events-none z-0">
-            {arrows}
-          </div>
+        {/* Sizing wrapper: scrollable area = content * scale */}
+        <div style={{ width: `${contentW * scale}px`, height: `${contentH * scale}px` }} data-bg="true">
+          <div
+            className="relative origin-top-left transition-transform duration-75 ease-linear"
+            style={{ transform: `scale(${scale})`, width: `${contentW}px`, height: `${contentH}px` }}
+            data-bg="true"
+          >
+            <div className="absolute inset-0 pointer-events-none z-0">
+              {arrows}
+            </div>
 
-          {nodes.map(node => (
-            <NodeCard
-              key={node.id}
-              node={node}
-              isSelected={selectedNode?.id === node.id}
-              onSelect={setSelectedNode}
-              onUpdate={handleUpdateNode}
-              onDragStart={handleDragStart}
-              style={{ transform: `translate(${node.posX}px, ${node.posY}px)` }}
-            />
-          ))}
+            {nodes.map(node => (
+              <NodeCard
+                key={node.id}
+                node={node}
+                isSelected={selectedNode?.id === node.id}
+                onSelect={setSelectedNode}
+                onUpdate={handleUpdateNode}
+                onDragStart={handleDragStart}
+                style={{ transform: `translate(${node.posX}px, ${node.posY}px)` }}
+              />
+            ))}
+          </div>
         </div>
       </main>
 

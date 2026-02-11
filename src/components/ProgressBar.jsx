@@ -1,4 +1,4 @@
-export default function ProgressBar({ current, total, slide, onLayersClick }) {
+export default function ProgressBar({ current, total, slide }) {
   const pct = ((current + 1) / total) * 100
 
   return (
@@ -10,9 +10,6 @@ export default function ProgressBar({ current, total, slide, onLayersClick }) {
         <div className="flex items-center gap-4">
           {slide.blockTitle && (
             <span className="text-swiss-muted">{String(slide.block).padStart(2, '0')} — {slide.blockTitle}</span>
-          )}
-          {onLayersClick && (
-            <button onClick={onLayersClick} className="px-2.5 py-0.5 text-swiss-muted hover:text-swiss-red border border-swiss-gray/40 rounded hover:border-swiss-red/40 transition-colors">Layers</button>
           )}
         </div>
       </div>

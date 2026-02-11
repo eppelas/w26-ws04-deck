@@ -695,6 +695,538 @@ function addLights(scene) {
   scene.add(new THREE.DirectionalLight(0xE0E8FF, 0.3).translateZ(-10))
 }
 
+// ============================================================
+// LEVEL VOXEL BUILDERS
+// ============================================================
+
+function buildLevel1_Awareness() {
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
+  camera.position.set(14, 12, 18)
+  const vGeo = new THREE.BoxGeometry(1, 1, 1)
+
+  // Lighthouse tower
+  const tower = new THREE.Group()
+  function addV(x,y,z,m=grayMat){const v=new THREE.Mesh(vGeo,m);v.position.set(x,y,z);v.castShadow=true;tower.add(v)}
+  for(let x=-2;x<=2;x++) for(let z=-2;z<=2;z++) addV(x,0,z,blackMat)
+  for(let x=-1;x<=1;x++) for(let z=-1;z<=1;z++){addV(x,1,z);addV(x,2,z)}
+  addV(0,3,0);addV(1,3,0);addV(-1,3,0);addV(0,3,1);addV(0,3,-1)
+  addV(0,4,0);addV(1,4,0);addV(-1,4,0);addV(0,4,1);addV(0,4,-1)
+  addV(0,5,0);addV(0,6,0)
+  addV(0,7,0,redMat);addV(1,7,0,redMat);addV(-1,7,0,redMat);addV(0,7,1,redMat);addV(0,7,-1,redMat);addV(0,8,0,redMat)
+  scene.add(tower)
+
+  // Light beams
+  const beamGeo=new THREE.BoxGeometry(0.4,0.4,0.4)
+  const beamMat=new THREE.MeshStandardMaterial({color:RED,roughness:0.3,transparent:true,opacity:0.6,emissive:RED,emissiveIntensity:0.15})
+  const beams=[]
+  const dirs=[[1,0.2,0],[-1,0.2,0],[0,0.2,1],[0,0.2,-1],[0.7,0.3,0.7],[-0.7,0.3,-0.7]]
+  dirs.forEach(d=>{for(let i=1;i<=8;i++){const m=new THREE.Mesh(beamGeo,beamMat.clone());m.position.set(d[0]*i*1.2,7.5+d[1]*i,d[2]*i*1.2);scene.add(m);beams.push({mesh:m,baseY:7.5+d[1]*i,off:i*0.3})}})
+
+  // Particles
+  const pGeo=new THREE.BoxGeometry(0.2,0.2,0.2)
+  const parts=[]
+  for(let i=0;i<30;i++){const p=new THREE.Mesh(pGeo,i%3===0?redMat:mutedMat);p.position.set((Math.random()-0.5)*16,Math.random()*14,(Math.random()-0.5)*16);scene.add(p);parts.push({mesh:p,vy:0.008+Math.random()*0.012})}
+
+  addLights(scene)
+  let angle=0
+  return{scene,camera,animate(t){
+    angle+=0.0005;camera.position.x=Math.cos(angle)*20;camera.position.z=Math.sin(angle)*20;camera.position.y=12+Math.sin(t*0.08);camera.lookAt(0,4,0)
+    beams.forEach(b=>{b.mesh.position.y=b.baseY+Math.sin(t*0.5+b.off)*0.15;b.mesh.material.opacity=0.3+Math.sin(t*0.8+b.off)*0.3})
+    parts.forEach(p=>{p.mesh.position.y+=p.vy*0.2;p.mesh.rotation.x+=0.003;if(p.mesh.position.y>16){p.mesh.position.y=-1;p.mesh.position.x=(Math.random()-0.5)*16;p.mesh.position.z=(Math.random()-0.5)*16}})
+  }}
+}
+
+function buildLevel2_Usage() {
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
+  camera.position.set(16, 10, 16)
+  const vGeo = new THREE.BoxGeometry(1, 1, 1)
+
+  const colors=[0x3B82F6,0xF59E0B,0x22C55E,0x8B5CF6,RED]
+  const cMats=colors.map(c=>mat(c,true))
+
+  // Central prism
+  const prism=new THREE.Group()
+  ;[[-1,0,0],[0,0,0],[1,0,0],[0,0,1],[0,0,-1],[-1,1,0],[0,1,0],[1,1,0],[0,2,0],[0,3,0]].forEach(([x,y,z],i)=>{
+    const m=new THREE.Mesh(vGeo,i===9?redMat:blackMat);m.position.set(x,y,z);m.castShadow=true;prism.add(m)
+  })
+  scene.add(prism)
+
+  // 5 towers
+  const tData=[{x:-6,z:0,h:5},{x:-3,z:-5,h:6},{x:3,z:-5,h:4},{x:6,z:0,h:5},{x:0,z:6,h:7}]
+  tData.forEach((td,ti)=>{
+    for(let y=0;y<=td.h;y++){const m=new THREE.Mesh(vGeo,y===td.h?cMats[ti]:grayMat);m.position.set(td.x,y,td.z);m.castShadow=true;scene.add(m)}
+  })
+
+  // Connection dots
+  const connGeo=new THREE.BoxGeometry(0.3,0.3,0.3)
+  const conns=[]
+  tData.forEach((td,ti)=>{const d=new THREE.Vector3(td.x,td.h*0.5,td.z).normalize();for(let j=1;j<=6;j++){const m=new THREE.Mesh(connGeo,cMats[ti]);m.position.set(d.x*j*1.2,2+d.y*j*0.8,d.z*j*1.2);scene.add(m);conns.push({mesh:m,baseY:2+d.y*j*0.8,ph:ti+j*0.4})}})
+
+  // Particles
+  const pGeo=new THREE.BoxGeometry(0.15,0.15,0.15)
+  const parts=[]
+  for(let i=0;i<35;i++){const p=new THREE.Mesh(pGeo,cMats[i%5]);p.position.set((Math.random()-0.5)*18,Math.random()*12,(Math.random()-0.5)*18);scene.add(p);parts.push({mesh:p,vy:0.008+Math.random()*0.015})}
+
+  addLights(scene)
+  let angle=0
+  return{scene,camera,animate(t){
+    angle+=0.0005;camera.position.x=Math.cos(angle)*22;camera.position.z=Math.sin(angle)*22;camera.position.y=10+Math.sin(t*0.06)*1.5;camera.lookAt(0,3,0)
+    prism.position.y=Math.sin(t*0.3)*0.1
+    conns.forEach(c=>{c.mesh.position.y=c.baseY+Math.sin(t*0.6+c.ph)*0.2})
+    parts.forEach(p=>{p.mesh.position.y+=p.vy*0.2;p.mesh.rotation.x+=0.003;if(p.mesh.position.y>14){p.mesh.position.y=-1;p.mesh.position.x=(Math.random()-0.5)*18;p.mesh.position.z=(Math.random()-0.5)*18}})
+  }}
+}
+
+function buildLevel3_Context() {
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
+  camera.position.set(16, 14, 18)
+  const vGeo = new THREE.BoxGeometry(1, 1, 1)
+
+  // Bookshelves in a ring
+  const shelves=[]
+  const sPos=[{x:-4,z:-2},{x:-4,z:0},{x:-4,z:2},{x:4,z:-2},{x:4,z:0},{x:4,z:2},{x:-2,z:-4},{x:0,z:-4},{x:2,z:-4}]
+  sPos.forEach((sp,idx)=>{
+    const h=3+Math.floor(Math.random()*4)
+    for(let y=0;y<h;y++){const m=new THREE.Mesh(vGeo,y===h-1?(idx%3===0?redMat:mutedMat):grayMat);m.position.set(sp.x,y,sp.z);m.castShadow=true;scene.add(m);shelves.push({mesh:m,baseY:y,ph:idx*0.5+y*0.3})}
+  })
+
+  // Central core — red brain
+  const core=new THREE.Group()
+  ;[[0,4,0],[1,4,0],[-1,4,0],[0,4,1],[0,4,-1],[0,5,0],[1,5,0],[-1,5,0],[0,5,1],[0,5,-1],[0,6,0],[0,7,0]].forEach(([x,y,z])=>{
+    const m=new THREE.Mesh(vGeo,redMat);m.position.set(x,y,z);m.castShadow=true;core.add(m)
+  })
+  scene.add(core)
+
+  // Streams spiraling into core
+  const stGeo=new THREE.BoxGeometry(0.25,0.25,0.25)
+  const streams=[]
+  for(let i=0;i<50;i++){const a=Math.random()*Math.PI*2;const d=2+Math.random()*5;const m=new THREE.Mesh(stGeo,i%4===0?redMat:mutedMat);m.position.set(Math.cos(a)*d,-2,Math.sin(a)*d);scene.add(m);streams.push({mesh:m,angle:a,dist:d,speed:0.02+Math.random()*0.03})}
+
+  addLights(scene)
+  const coreLight=new THREE.PointLight(RED,0.5,12);coreLight.position.set(0,5,0);scene.add(coreLight)
+  let angle=0
+  return{scene,camera,animate(t){
+    angle+=0.0005;camera.position.x=Math.cos(angle)*22;camera.position.z=Math.sin(angle)*22;camera.position.y=14+Math.sin(t*0.07);camera.lookAt(0,4,0)
+    core.position.y=Math.sin(t*0.3)*0.2;core.rotation.y=t*0.05;coreLight.intensity=0.4+Math.sin(t*0.8)*0.2
+    streams.forEach(s=>{s.mesh.position.y+=s.speed;const sa=s.angle+t*0.1;const sh=Math.max(0.5,s.dist-s.mesh.position.y*0.3);s.mesh.position.x=Math.cos(sa)*sh;s.mesh.position.z=Math.sin(sa)*sh;s.mesh.rotation.x+=0.01;if(s.mesh.position.y>8){s.mesh.position.y=-2;s.angle=Math.random()*Math.PI*2;s.dist=2+Math.random()*5}})
+    shelves.forEach(s=>{s.mesh.position.y=s.baseY+Math.sin(t*0.2+s.ph)*0.02})
+  }}
+}
+
+function buildLevel4_Building() {
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
+  camera.position.set(18, 14, 18)
+  const vGeo = new THREE.BoxGeometry(1, 1, 1)
+
+  // Foundation
+  for(let x=-3;x<=3;x++) for(let z=-2;z<=2;z++){const m=new THREE.Mesh(vGeo,blackMat);m.position.set(x,0,z);m.castShadow=true;scene.add(m)}
+  // Walls
+  for(let y=1;y<=6;y++){for(let x=-3;x<=3;x+=6){const m=new THREE.Mesh(vGeo,y>4?mutedMat:grayMat);m.position.set(x,y,-2);m.castShadow=true;scene.add(m);if(y<=5){const m2=new THREE.Mesh(vGeo,y>4?mutedMat:grayMat);m2.position.set(x,y,2);m2.castShadow=true;scene.add(m2)}}}
+  // Red top
+  const redTops=[];[-1,0,1].forEach(x=>{const m=new THREE.Mesh(vGeo,redMat);m.position.set(x,7,0);m.castShadow=true;scene.add(m);redTops.push(m)})
+  // Crane
+  for(let y=0;y<=12;y++){const m=new THREE.Mesh(vGeo,y>10?redMat:blackMat);m.position.set(6,y,0);m.castShadow=true;scene.add(m)}
+  for(let x=-2;x<=6;x++){const m=new THREE.Mesh(vGeo,blackMat);m.position.set(x,12,0);m.castShadow=true;scene.add(m)}
+
+  // Floating blocks
+  const floaters=[]
+  const fData=[{t:[0,8,0],d:0},{t:[2,6,1],d:1},{t:[-2,5,0],d:2},{t:[1,5,-1],d:3},{t:[-1,6,1],d:4}]
+  fData.forEach(fd=>{const m=new THREE.Mesh(vGeo,Math.random()>0.7?redMat:grayMat);m.position.set(fd.t[0]+(Math.random()-0.5)*2,15+Math.random()*8,fd.t[2]);m.castShadow=true;scene.add(m);floaters.push({mesh:m,target:new THREE.Vector3(...fd.t),delay:fd.d,arrived:false,speed:0.015+Math.random()*0.01})})
+
+  // Particles
+  const pGeo=new THREE.BoxGeometry(0.15,0.15,0.15)
+  const parts=[]
+  for(let i=0;i<25;i++){const p=new THREE.Mesh(pGeo,i%4===0?redMat:mutedMat);p.position.set((Math.random()-0.5)*16,Math.random()*15,(Math.random()-0.5)*12);scene.add(p);parts.push({mesh:p,vy:0.01+Math.random()*0.015})}
+
+  addLights(scene)
+  let angle=0
+  return{scene,camera,animate(t){
+    angle+=0.0005;camera.position.x=Math.cos(angle)*24;camera.position.z=Math.sin(angle)*24;camera.position.y=14+Math.sin(t*0.06);camera.lookAt(0,5,0)
+    floaters.forEach(f=>{if(t<f.delay)return;if(f.arrived){f.mesh.position.y=f.target.y+Math.sin(t*0.4+f.delay)*0.03;return};const dir=new THREE.Vector3().subVectors(f.target,f.mesh.position);const dist=dir.length();if(dist<0.1){f.mesh.position.copy(f.target);f.arrived=true}else{dir.normalize().multiplyScalar(Math.min(f.speed*0.3*(1+t*0.04),dist));f.mesh.position.add(dir)}})
+    redTops.forEach((m,i)=>{m.position.y=7+Math.sin(t*0.5+i)*0.15})
+    parts.forEach(p=>{p.mesh.position.y+=p.vy*0.2;p.mesh.rotation.x+=0.003;if(p.mesh.position.y>16){p.mesh.position.y=-1;p.mesh.position.x=(Math.random()-0.5)*16}})
+  }}
+}
+
+function buildLevel5_Engineering() {
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
+  camera.position.set(18, 12, 18)
+  const vGeo = new THREE.BoxGeometry(1, 1, 1)
+
+  // Architect figure
+  const fig=new THREE.Group()
+  function addF(x,y,z,m=blackMat){const v=new THREE.Mesh(vGeo,m);v.position.set(x,y,z);v.castShadow=true;fig.add(v)}
+  addF(-0.5,0,0);addF(-0.5,1,0);addF(0.5,0,0);addF(0.5,1,0)
+  addF(0,2,0);addF(0,3,0);addF(0,4,0);addF(-1,4,0);addF(1,4,0)
+  addF(-2,4,0,redMat);addF(2,4,0,redMat);addF(-2,3,0.5);addF(2,3,0.5)
+  addF(0,5,0);addF(0,6,0,redMat)
+  scene.add(fig)
+
+  // Orbiting satellites
+  const orbits=[]
+  const oData=[{r:5,sp:0.3,y:3,s:1.2,mi:0},{r:7,sp:-0.2,y:5,s:0.8,mi:1},{r:6,sp:0.15,y:1,s:1.0,mi:2},{r:8,sp:-0.1,y:6,s:0.6,mi:0},{r:4,sp:0.4,y:7,s:0.7,mi:3},{r:9,sp:0.08,y:2,s:0.9,mi:1}]
+  const oMats=[redMat,grayMat,mutedMat,blackMat]
+  oData.forEach(od=>{const sat=new THREE.Group();const geo=new THREE.BoxGeometry(od.s,od.s,od.s);const m1=new THREE.Mesh(geo,oMats[od.mi]);m1.castShadow=true;sat.add(m1);const m2=new THREE.Mesh(new THREE.BoxGeometry(od.s*0.6,od.s*0.6,od.s*0.6),od.mi===0?blackMat:redMat);m2.position.set(od.s*0.8,0,0);m2.castShadow=true;sat.add(m2);scene.add(sat);orbits.push({group:sat,radius:od.r,speed:od.sp,y:od.y,phase:Math.random()*Math.PI*2})})
+
+  // Connection dots
+  const connGeo=new THREE.BoxGeometry(0.15,0.15,0.15)
+  const connMat2=new THREE.MeshStandardMaterial({color:RED,transparent:true,opacity:0.4,emissive:RED,emissiveIntensity:0.1})
+  const conns=[]
+  for(let i=0;i<80;i++){const m=new THREE.Mesh(connGeo,connMat2);scene.add(m);conns.push({mesh:m,oi:i%oData.length,t:i/80})}
+
+  // Orbit rings
+  const ringGeo=new THREE.BoxGeometry(0.1,0.1,0.1)
+  const ringMat=new THREE.MeshStandardMaterial({color:GRAY,transparent:true,opacity:0.15})
+  oData.forEach(od=>{for(let a=0;a<Math.PI*2;a+=0.15){const m=new THREE.Mesh(ringGeo,ringMat);m.position.set(Math.cos(a)*od.r,od.y,Math.sin(a)*od.r);scene.add(m)}})
+
+  // Particles
+  const pGeo=new THREE.BoxGeometry(0.12,0.12,0.12)
+  const parts=[]
+  for(let i=0;i<40;i++){const p=new THREE.Mesh(pGeo,i%3===0?redMat:mutedMat);p.position.set((Math.random()-0.5)*20,Math.random()*12,(Math.random()-0.5)*20);scene.add(p);parts.push({mesh:p,vy:0.006+Math.random()*0.01})}
+
+  addLights(scene)
+  scene.add(new THREE.PointLight(RED,0.3,15).translateY(4))
+  let camAngle=0
+  return{scene,camera,animate(t){
+    camAngle+=0.0004;camera.position.x=Math.cos(camAngle)*22;camera.position.z=Math.sin(camAngle)*22;camera.position.y=12+Math.sin(t*0.05)*2;camera.lookAt(0,4,0)
+    fig.position.y=Math.sin(t*0.25)*0.1
+    orbits.forEach(o=>{const a=t*o.speed+o.phase;o.group.position.set(Math.cos(a)*o.radius,o.y+Math.sin(t*0.3+o.phase)*0.3,Math.sin(a)*o.radius);o.group.rotation.y=a})
+    conns.forEach(c=>{const o=orbits[c.oi];c.mesh.position.lerpVectors(new THREE.Vector3(0,4,0),o.group.position,c.t);c.mesh.position.y+=Math.sin(t*0.5+c.t*5)*0.1})
+    parts.forEach(p=>{p.mesh.position.y+=p.vy*0.2;p.mesh.rotation.x+=0.002;if(p.mesh.position.y>14){p.mesh.position.y=-1;p.mesh.position.x=(Math.random()-0.5)*20;p.mesh.position.z=(Math.random()-0.5)*20}})
+  }}
+}
+
+// ============================================================
+// SECTION-SPECIFIC VOXEL BUILDERS
+// ============================================================
+
+// Creative Toolkit — floating spectrum of colorful cubes
+function buildScene_Palette() {
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
+  camera.position.set(0, 14, 24)
+  const vGeo = new THREE.BoxGeometry(1, 1, 1)
+
+  const colors = [0xDC2626, 0xF97316, 0xFACC15, 0x22C55E, 0x3B82F6, 0x8B5CF6, 0xEC4899]
+  const mats = colors.map(c => mat(c, true))
+  const cubes = []
+
+  // Spiral arrangement of colored cubes
+  for(let i=0; i<70; i++){
+    const angle = i * 0.45
+    const r = 2 + i * 0.12
+    const y = (i - 35) * 0.15
+    const m = new THREE.Mesh(vGeo, mats[i % mats.length])
+    const scale = 0.5 + Math.random() * 0.8
+    m.scale.set(scale, scale, scale)
+    m.position.set(Math.cos(angle) * r, y, Math.sin(angle) * r)
+    m.rotation.set(Math.random(), Math.random(), Math.random())
+    m.castShadow = true
+    scene.add(m)
+    cubes.push({ mesh: m, angle, r, baseY: y, speed: 0.3 + Math.random() * 0.4, rotSpeed: 0.005 + Math.random() * 0.01 })
+  }
+
+  // Central white core
+  const coreMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.2, metalness: 0.1 })
+  for(let x=-1; x<=1; x++) for(let y=-1; y<=1; y++) for(let z=-1; z<=1; z++){
+    if(Math.abs(x)+Math.abs(y)+Math.abs(z) > 2) continue
+    const m = new THREE.Mesh(vGeo, coreMat)
+    m.position.set(x, y, z); m.castShadow = true; scene.add(m)
+  }
+
+  addLights(scene)
+  let camAngle = 0
+  return { scene, camera, animate(t) {
+    camAngle += 0.003
+    camera.position.x = Math.cos(camAngle) * 24
+    camera.position.z = Math.sin(camAngle) * 24
+    camera.position.y = 14 + Math.sin(t * 0.08) * 2
+    camera.lookAt(0, 0, 0)
+    cubes.forEach(c => {
+      c.mesh.position.y = c.baseY + Math.sin(t * 0.15 * c.speed + c.angle) * 1.5
+      c.mesh.rotation.x += c.rotSpeed
+      c.mesh.rotation.z += c.rotSpeed * 0.7
+    })
+  }}
+}
+
+// Agents — network of connected nodes
+function buildScene_Network() {
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
+  camera.position.set(18, 14, 18)
+  const vGeo = new THREE.BoxGeometry(1, 1, 1)
+  const sGeo = new THREE.SphereGeometry(0.8, 8, 8)
+  const nodeMat = mat(RED, true)
+  const edgeMat = new THREE.MeshStandardMaterial({ color: MUTED, roughness: 0.5, transparent: true, opacity: 0.4 })
+  const hubMat = mat(BLACK)
+
+  // Generate node positions in 3D space
+  const nodes = []
+  const positions = [
+    [0,5,0], [-6,8,3], [5,3,-4], [-4,1,-6], [7,7,2], [-3,6,-3],
+    [4,9,5], [-7,3,4], [6,1,6], [-2,10,-1], [3,4,-7], [8,6,-3],
+    [-5,2,5], [1,8,-5], [-6,5,-5], [5,10,0]
+  ]
+  positions.forEach((p, i) => {
+    const isHub = i < 3
+    const m = isHub ? new THREE.Mesh(vGeo, hubMat) : new THREE.Mesh(sGeo, nodeMat)
+    if(isHub) m.scale.set(1.8, 1.8, 1.8)
+    m.position.set(p[0], p[1], p[2]); m.castShadow = true; scene.add(m)
+    nodes.push({ mesh: m, base: new THREE.Vector3(p[0], p[1], p[2]), phase: Math.random() * Math.PI * 2 })
+  })
+
+  // Edges between nearby nodes
+  const edgeGeo = new THREE.BoxGeometry(0.15, 0.15, 1)
+  const edges = []
+  for(let i=0; i<nodes.length; i++) for(let j=i+1; j<nodes.length; j++){
+    const d = nodes[i].base.distanceTo(nodes[j].base)
+    if(d < 10) {
+      const m = new THREE.Mesh(edgeGeo, edgeMat)
+      scene.add(m)
+      edges.push({ mesh: m, a: i, b: j })
+    }
+  }
+
+  // Traveling pulses on edges
+  const pulseGeo = new THREE.BoxGeometry(0.4, 0.4, 0.4)
+  const pulseMat = mat(RED, true)
+  const pulses = []
+  for(let i=0; i<20; i++){
+    const m = new THREE.Mesh(pulseGeo, pulseMat)
+    scene.add(m)
+    pulses.push({ mesh: m, edge: Math.floor(Math.random() * edges.length), prog: Math.random(), speed: 0.005 + Math.random() * 0.008 })
+  }
+
+  addLights(scene)
+  let camAngle = 0.3
+  return { scene, camera, animate(t) {
+    camAngle += 0.0008
+    camera.position.x = Math.cos(camAngle) * 22
+    camera.position.z = Math.sin(camAngle) * 22
+    camera.position.y = 12 + Math.sin(t * 0.06) * 3
+    camera.lookAt(0, 5, 0)
+    nodes.forEach(n => {
+      n.mesh.position.y = n.base.y + Math.sin(t * 0.12 + n.phase) * 0.4
+    })
+    edges.forEach(e => {
+      const a = nodes[e.a].mesh.position, b = nodes[e.b].mesh.position
+      e.mesh.position.lerpVectors(a, b, 0.5)
+      e.mesh.lookAt(b)
+      e.mesh.scale.z = a.distanceTo(b)
+    })
+    pulses.forEach(p => {
+      p.prog += p.speed
+      if(p.prog > 1) { p.prog = 0; p.edge = Math.floor(Math.random() * edges.length) }
+      const e = edges[p.edge]
+      const a = nodes[e.a].mesh.position, b = nodes[e.b].mesh.position
+      p.mesh.position.lerpVectors(a, b, p.prog)
+    })
+  }}
+}
+
+// PRD — floating blueprint grid
+function buildScene_Blueprint() {
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
+  camera.position.set(16, 16, 16)
+  const vGeo = new THREE.BoxGeometry(1, 1, 1)
+  const frameMat = mat(BLACK)
+  const fillMat = new THREE.MeshStandardMaterial({ color: GRAY, roughness: 0.4, transparent: true, opacity: 0.6 })
+  const accentMat = mat(RED, true)
+
+  const doc = new THREE.Group()
+  // Document frame — wireframe rectangle
+  const W = 10, H = 14
+  for(let x = -W/2; x <= W/2; x++) {
+    const m1 = new THREE.Mesh(vGeo, frameMat); m1.position.set(x, H/2, 0); m1.scale.set(1, 0.3, 0.3); doc.add(m1)
+    const m2 = new THREE.Mesh(vGeo, frameMat); m2.position.set(x, -H/2, 0); m2.scale.set(1, 0.3, 0.3); doc.add(m2)
+  }
+  for(let y = -H/2; y <= H/2; y++) {
+    const m1 = new THREE.Mesh(vGeo, frameMat); m1.position.set(-W/2, y, 0); m1.scale.set(0.3, 1, 0.3); doc.add(m1)
+    const m2 = new THREE.Mesh(vGeo, frameMat); m2.position.set(W/2, y, 0); m2.scale.set(0.3, 1, 0.3); doc.add(m2)
+  }
+
+  // Content lines
+  const lines = []
+  for(let row = 0; row < 8; row++) {
+    const y = H/2 - 1.5 - row * 1.6
+    const w = 3 + Math.random() * 5
+    const isAccent = row === 0 || row === 4
+    const m = new THREE.Mesh(vGeo, isAccent ? accentMat : fillMat)
+    m.scale.set(w, 0.5, 0.4)
+    m.position.set(-W/2 + 1.5 + w/2, y, 0.2)
+    doc.add(m)
+    lines.push({ mesh: m, baseY: y, phase: row * 0.5 })
+  }
+
+  // Floating checkboxes
+  const checks = []
+  for(let i = 0; i < 4; i++) {
+    const y = H/2 - 7 - i * 1.6
+    const m = new THREE.Mesh(vGeo, i < 2 ? accentMat : frameMat)
+    m.scale.set(0.6, 0.6, 0.6)
+    m.position.set(-W/2 + 1, y, 0.3)
+    doc.add(m)
+    checks.push({ mesh: m, baseY: y })
+  }
+
+  doc.rotation.y = -0.2
+  scene.add(doc)
+
+  addLights(scene)
+  let camAngle = 0.4
+  return { scene, camera, animate(t) {
+    camAngle += 0.001
+    camera.position.x = Math.cos(camAngle) * 20
+    camera.position.z = Math.sin(camAngle) * 20
+    camera.position.y = 14 + Math.sin(t * 0.07) * 2
+    camera.lookAt(0, 0, 0)
+    doc.position.y = Math.sin(t * 0.1) * 0.5
+    doc.rotation.y = -0.2 + Math.sin(t * 0.05) * 0.1
+    lines.forEach(l => { l.mesh.position.y = l.baseY + Math.sin(t * 0.15 + l.phase) * 0.1 })
+  }}
+}
+
+// Demo Day — podium with rising blocks and spotlight
+function buildScene_Spotlight() {
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
+  camera.position.set(14, 12, 18)
+  const vGeo = new THREE.BoxGeometry(1, 1, 1)
+
+  // Podium — stacked platform
+  const podMat = mat(BLACK)
+  const topMat = mat(RED, true)
+  for(let layer = 0; layer < 3; layer++) {
+    const sz = 6 - layer * 1.5
+    for(let x = -sz; x <= sz; x++) for(let z = -sz; z <= sz; z++) {
+      const m = new THREE.Mesh(vGeo, layer === 2 ? topMat : podMat)
+      m.position.set(x, layer, z); m.castShadow = true; scene.add(m)
+    }
+  }
+
+  // Rising celebration blocks
+  const celebMat = mat(GRAY)
+  const celebs = []
+  for(let i = 0; i < 40; i++) {
+    const m = new THREE.Mesh(vGeo, i % 5 === 0 ? topMat : celebMat)
+    const s = 0.3 + Math.random() * 0.6
+    m.scale.set(s, s, s)
+    m.castShadow = true; scene.add(m)
+    celebs.push({
+      mesh: m,
+      x: (Math.random() - 0.5) * 12,
+      z: (Math.random() - 0.5) * 12,
+      speed: 0.02 + Math.random() * 0.04,
+      phase: Math.random() * Math.PI * 2,
+      maxH: 6 + Math.random() * 10
+    })
+  }
+
+  // Spotlight beam — column of semi-transparent cubes
+  const beamMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.08, roughness: 0.1 })
+  for(let y = 3; y < 18; y++) {
+    const sz = 0.5 + (y - 3) * 0.2
+    const m = new THREE.Mesh(vGeo, beamMat)
+    m.scale.set(sz, 1, sz)
+    m.position.set(0, y, 0); scene.add(m)
+  }
+
+  addLights(scene)
+  const spotLight = new THREE.PointLight(0xFFFFFF, 0.8, 25)
+  spotLight.position.set(0, 18, 0); scene.add(spotLight)
+
+  let camAngle = 0.5
+  return { scene, camera, animate(t) {
+    camAngle += 0.0015
+    camera.position.x = Math.cos(camAngle) * 20
+    camera.position.z = Math.sin(camAngle) * 20
+    camera.position.y = 10 + Math.sin(t * 0.08) * 3
+    camera.lookAt(0, 4, 0)
+    celebs.forEach(c => {
+      const h = (Math.sin(t * 0.1 * c.speed * 20 + c.phase) + 1) * 0.5 * c.maxH
+      c.mesh.position.set(c.x, 3 + h, c.z)
+      c.mesh.rotation.y += c.speed * 0.3
+    })
+  }}
+}
+
+// Friction Auditing — magnifying lens scanning grid
+function buildScene_Lens() {
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500)
+  camera.position.set(0, 22, 18)
+  const vGeo = new THREE.BoxGeometry(1, 1, 1)
+
+  // Flat grid of small cubes
+  const gridMat = mat(GRAY)
+  const gridCubes = []
+  for(let x = -8; x <= 8; x += 2) for(let z = -8; z <= 8; z += 2) {
+    const m = new THREE.Mesh(vGeo, gridMat)
+    m.scale.set(1.5, 0.3, 1.5)
+    m.position.set(x, 0, z); m.castShadow = true; scene.add(m)
+    gridCubes.push({ mesh: m, x, z, baseScale: 0.3 })
+  }
+
+  // Lens ring — circle of dark cubes
+  const lensMat = mat(BLACK)
+  const lensGroup = new THREE.Group()
+  const lensR = 4
+  for(let a = 0; a < Math.PI * 2; a += 0.2) {
+    const m = new THREE.Mesh(vGeo, lensMat)
+    m.scale.set(0.8, 0.8, 0.8)
+    m.position.set(Math.cos(a) * lensR, 3, Math.sin(a) * lensR)
+    lensGroup.add(m)
+  }
+  // Lens handle
+  for(let i = 0; i < 6; i++) {
+    const m = new THREE.Mesh(vGeo, lensMat)
+    m.scale.set(0.6, 0.6, 0.6)
+    m.position.set(lensR + 1 + i * 0.8, 3 - i * 0.5, lensR + 1 + i * 0.8)
+    lensGroup.add(m)
+  }
+  scene.add(lensGroup)
+
+  // Highlighted cubes under lens
+  const highlightMat = mat(RED, true)
+
+  addLights(scene)
+  let camAngle = 0
+  return { scene, camera, animate(t) {
+    camAngle += 0.001
+    camera.position.x = Math.sin(camAngle) * 18
+    camera.position.z = 18 * Math.cos(camAngle)
+    camera.position.y = 22 + Math.sin(t * 0.06) * 2
+    camera.lookAt(0, 1, 0)
+
+    // Move lens in slow figure-8
+    const lx = Math.sin(t * 0.08) * 5
+    const lz = Math.sin(t * 0.06) * 5
+    lensGroup.position.set(lx, 0, lz)
+
+    // Highlight grid cubes near lens
+    gridCubes.forEach(gc => {
+      const dx = gc.x - lx, dz = gc.z - lz
+      const dist = Math.sqrt(dx * dx + dz * dz)
+      if(dist < lensR + 1) {
+        gc.mesh.material = highlightMat
+        gc.mesh.scale.y = 0.3 + (1 - dist / (lensR + 1)) * 2
+        gc.mesh.position.y = gc.mesh.scale.y * 0.5
+      } else {
+        gc.mesh.material = gridMat
+        gc.mesh.scale.y = 0.3
+        gc.mesh.position.y = 0
+      }
+    })
+  }}
+}
+
 // Scene registry
 const BUILDERS = {
   '/voxels/slide1-builder.html': buildScene1_Builder,
@@ -702,6 +1234,16 @@ const BUILDERS = {
   '/voxels/slide3-steps.html': buildScene3_Steps,
   '/voxels/slide4-archive.html': buildScene4_Archive,
   '/voxels/slide9-mindshift.html': buildScene9_Mindshift,
+  '/voxels/level1-awareness.html': buildLevel1_Awareness,
+  '/voxels/level2-usage.html': buildLevel2_Usage,
+  '/voxels/level3-context.html': buildLevel3_Context,
+  '/voxels/level4-building.html': buildLevel4_Building,
+  '/voxels/level5-engineering.html': buildLevel5_Engineering,
+  '/voxels/palette.html': buildScene_Palette,
+  '/voxels/network.html': buildScene_Network,
+  '/voxels/blueprint.html': buildScene_Blueprint,
+  '/voxels/spotlight.html': buildScene_Spotlight,
+  '/voxels/lens.html': buildScene_Lens,
 }
 
 // ============================================================
