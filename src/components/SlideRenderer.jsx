@@ -62,6 +62,7 @@ export default function SlideRenderer({ slide }) {
     case 'highlight': content = <HighlightSlide s={slide} />; break;
     case 'tools': content = <ToolsSlide s={slide} />; break;
     case 'resources': content = <ResourcesSlide s={slide} />; break;
+    case 'links': content = <LinksSlide s={slide} />; break;
     case 'activity': content = <ActivitySlide s={slide} />; break;
     case 'checklist': content = <ChecklistSlide s={slide} />; break;
     case 'demoday': content = <DemoDaySlide s={slide} />; break;
@@ -892,6 +893,30 @@ function ResourcesSlide({ s }) {
               ))}
             </div>
           </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function LinksSlide({ s }) {
+  return (
+    <div className="space-y-5">
+      <h2 className="text-2xl font-extrabold text-swiss-black tracking-tight">{s.title}</h2>
+      {s.content && <p className="text-swiss-black text-sm leading-relaxed">{s.content}</p>}
+      <div className="space-y-2">
+        {s.items.map((item, i) => (
+          <a
+            key={i}
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center gap-3 p-3 rounded-lg border border-swiss-gray/50 hover:border-swiss-red/50 hover:bg-swiss-red/5 transition-colors animate-fade-in animate-fade-in-delay-${Math.min(i + 1, 5)}`}
+          >
+            <span className="text-swiss-red font-bold text-sm flex-shrink-0">{String(i + 1).padStart(2, '0')}</span>
+            <span className="text-swiss-black text-sm font-medium">{item.name}</span>
+            <span className="text-swiss-muted text-xs ml-auto flex-shrink-0">&rarr;</span>
+          </a>
         ))}
       </div>
     </div>
