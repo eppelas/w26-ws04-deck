@@ -4,13 +4,13 @@ import { NodeCard } from './NodeCard'
 import { DetailDrawer } from './DetailDrawer'
 import { WobblyArrow } from './WobblyArrow'
 import { CustomCursor } from './CustomCursor'
-import { RotateCcw, ArrowLeft } from 'lucide-react'
+import { RotateCcw, ArrowLeft, Plus, Minus } from 'lucide-react'
 
 const INITIAL_OFFSET_X = 200
 const INITIAL_OFFSET_Y = 150
 const GRID_X_SPACING = 380
 const GRID_Y_SPACING = 320
-const STORAGE_KEY = 'interaction_map_nodes_v8'
+const STORAGE_KEY = 'interaction_map_nodes_v9'
 
 export default function InteractionMap({ onBack }) {
   const [nodes, setNodes] = useState(() => {
@@ -183,8 +183,22 @@ export default function InteractionMap({ onBack }) {
         </div>
       </main>
 
-      {/* Reset Control */}
-      <div className="fixed bottom-8 right-8 z-50">
+      {/* Zoom & Reset Controls */}
+      <div className="fixed bottom-8 right-8 z-50 flex items-center gap-2">
+        <button
+          onClick={() => setScale(prev => Math.min(prev + 0.1, 3))}
+          className="p-3 rounded-full bg-white/80 hover:bg-white text-slate-600 hover:text-slate-800 transition-colors shadow-lg backdrop-blur-sm"
+          title="Zoom In"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
+        <button
+          onClick={() => setScale(prev => Math.max(prev - 0.1, 0.2))}
+          className="p-3 rounded-full bg-white/80 hover:bg-white text-slate-600 hover:text-slate-800 transition-colors shadow-lg backdrop-blur-sm"
+          title="Zoom Out"
+        >
+          <Minus className="w-5 h-5" />
+        </button>
         <button
           onClick={() => {
             if (window.confirm('Reset Layout?')) {
