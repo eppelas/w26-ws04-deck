@@ -663,7 +663,16 @@ Write 2-5 stories in this format:
 - State 3: [e.g., showing results]
 
 **Vibe reference:**
-> Link or describe a visual reference. "Like Notion but simpler." "Dark mode, minimal, one big button."
+> Pick one or describe your own. Link a screenshot or a site that feels right.
+
+| Style | Description | Examples |
+|-------|-------------|----------|
+| **Minimal Swiss** | White bg, black text, one accent color. Grid. Typography as hero. | Linear, Notion, iA Writer |
+| **Glassmorphism** | Frosted panels with blur over gradient/photo bg. Soft shadows, rounded corners. | Apple Vision Pro UI, macOS Control Center |
+| **Dashboard / Data-Dense** | Dark bg, bright accents (green, cyan, orange). Charts, tables, metrics. Compact cards. | Grafana, Vercel Dashboard, Bloomberg Terminal |
+| **Brutalist / Raw** | System fonts, visible borders, intentionally raw. Content over decoration. | Craigslist, HackerNews |
+| **Warm Editorial** | Serif headings, warm tones (cream, terracotta, olive). Magazine feel. | Substack, Medium, Apple Newsroom |
+| **Neon / Cyberpunk** | Dark bg (#0a0a0a), neon accents (cyan, magenta). Glow effects, monospace font. | Warp terminal, gaming UI |
 
 **Key interactions:**
 - What are the 2-3 main actions the user takes?
@@ -685,7 +694,20 @@ What we are NOT building in this version:
 
 ---
 
-## 6. Tech Preferences (optional)
+## 6. Error Handling Philosophy
+
+What should happen when something breaks?
+
+- **API not responding:** [show placeholder / retry 3x / show error message]
+- **Invalid user input:** [highlight field / auto-correct / ignore]
+- **Empty state:** [show onboarding hint / blank screen / sample data]
+- **Slow loading:** [skeleton loader / spinner / nothing]
+
+> Without this section, the model will decide for you — and usually badly.
+
+---
+
+## 7. Tech Preferences (optional)
 
 - **Framework:** [e.g., React, vanilla JS, Python script]
 - **Hosting:** [e.g., Vercel, GitHub Pages, local only]
@@ -696,7 +718,63 @@ What we are NOT building in this version:
 
 ---
 
-## 7. Success Metrics
+## 8. Existing Code Context (if adding to a project)
+
+> Skip this section if building from scratch.
+
+- **Current stack:** [e.g., React + Tailwind + Supabase]
+- **Folder structure:** [paste or describe]
+- **Routing:** [e.g., Next.js App Router, React Router, none]
+- **Key files to know about:** [e.g., src/lib/api.ts, src/components/Layout.tsx]
+
+---
+
+## 9. Examples of Input / Output
+
+> Concrete examples help the model more than abstract descriptions.
+
+**Example 1:**
+- Input: \`[paste real input]\`
+- Expected output: \`[paste or describe expected result]\`
+
+**Example 2:**
+- Input: \`[paste real input]\`
+- Expected output: \`[paste or describe expected result]\`
+
+---
+
+## 10. Constraints & Boundaries
+
+- [ ] Max [N] files
+- [ ] No external dependencies / only these: [list]
+- [ ] Must work in iframe / embed
+- [ ] Budget: $0 for hosting
+- [ ] Must work offline
+- [ ] [Add your own...]
+
+---
+
+## 11. Iteration Plan
+
+> Don't build everything at once. Models lose quality on large tasks.
+
+- **Step 1:** Build [core feature only]. Stop. Test.
+- **Step 2:** Add [second feature]. Stop. Test.
+- **Step 3:** Add [polish / edge cases].
+
+---
+
+## 12. Reference Implementation (optional)
+
+> A link to a working example is worth 100 lines of description.
+
+- **Similar product:** [URL or name]
+- **Screenshot:** [attach or link]
+- **Repo to reference:** [GitHub URL]
+
+---
+
+## 13. Success Metrics
 
 How do we know it works?
 
@@ -706,7 +784,7 @@ How do we know it works?
 
 ---
 
-## 8. Open Questions
+## 14. Open Questions
 
 - ?
 - ?
