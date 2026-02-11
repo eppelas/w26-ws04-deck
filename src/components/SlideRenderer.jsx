@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Download } from 'lucide-react'
 import VoxelScene from './VoxelScene'
 import { POLL_METAPHORS } from './PollMetaphors'
 
@@ -601,10 +602,140 @@ function TableSlide({ s }) {
   )
 }
 
+const PRD_MARKDOWN = `# PRD: [Product Name]
+
+## 1. Context & Vision
+
+**What pain are we solving?**
+> Describe the specific frustration, inefficiency, or unmet need.
+
+**Who is the user?**
+> Be specific: grandma? realtor? myself? a team of 5?
+
+**What does life look like AFTER this exists?**
+> Paint the picture. One paragraph.
+
+**What triggered this idea?**
+> A moment, a conversation, a recurring annoyance?
+
+---
+
+## 2. User Stories
+
+Write 2-5 stories in this format:
+
+- When I [situation], I want to [action], so that [outcome].
+- When I [situation], I want to [action], so that [outcome].
+- When I [situation], I want to [action], so that [outcome].
+
+---
+
+## 3. Functional Requirements
+
+**Input Data:**
+- What does the user provide? (text, file, voice, URL, nothing?)
+- Where does it come from? (manual input, API, clipboard, camera?)
+
+**Core Logic:**
+- What happens with the input? Step by step.
+- What decisions does the system make?
+
+**Output:**
+- What does the user get back? (text, file, notification, visual?)
+- In what format? (PDF, message, dashboard, audio?)
+
+**Edge Cases:**
+- What if the input is empty?
+- What if the input is very large?
+- What if the user does something unexpected?
+
+---
+
+## 4. The Interface (The Vibe)
+
+**Entry points:**
+- How does the user access this? (website, Telegram bot, browser extension, mobile app?)
+- What devices must it work on?
+
+**Key screens / states:**
+- State 1: [e.g., empty / waiting for input]
+- State 2: [e.g., processing / loading]
+- State 3: [e.g., showing results]
+
+**Vibe reference:**
+> Link or describe a visual reference. "Like Notion but simpler." "Dark mode, minimal, one big button."
+
+**Key interactions:**
+- What are the 2-3 main actions the user takes?
+
+---
+
+## 5. Non-Goals
+
+What we are NOT building in this version:
+
+- [ ] No database / no user accounts
+- [ ] No mobile version
+- [ ] No multi-language support
+- [ ] No admin panel
+- [ ] No analytics dashboard
+- [ ] [Add your own...]
+
+> This section is critical. Without it, AI will try to build a full SaaS platform when you just need a simple tool.
+
+---
+
+## 6. Tech Preferences (optional)
+
+- **Framework:** [e.g., React, vanilla JS, Python script]
+- **Hosting:** [e.g., Vercel, GitHub Pages, local only]
+- **AI model:** [e.g., GPT-4, Claude, local LLM]
+- **Other:** [e.g., must work offline, needs Telegram integration]
+
+> If you don't know — leave blank. A smart model will suggest the right stack.
+
+---
+
+## 7. Success Metrics
+
+How do we know it works?
+
+- [ ] [e.g., Grandma can see the text on her tablet]
+- [ ] [e.g., Takes less than 30 seconds from input to result]
+- [ ] [e.g., I actually use it daily for a week]
+
+---
+
+## 8. Open Questions
+
+- ?
+- ?
+- ?
+`;
+
 function PrdSlide({ s }) {
+  const handleDownload = () => {
+    const blob = new Blob([PRD_MARKDOWN], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'PRD-Template.md'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="space-y-5">
-      <h2 className="text-2xl font-extrabold text-swiss-black tracking-tight">{s.title}</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-extrabold text-swiss-black tracking-tight">{s.title}</h2>
+        <button
+          onClick={handleDownload}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-swiss-red text-white text-sm font-medium hover:bg-red-700 transition-colors shadow-sm"
+        >
+          <Download className="w-4 h-4" />
+          Download .md
+        </button>
+      </div>
       <div className="grid gap-2">
         {s.items.map((item, i) => (
           <div key={i} className={`flex items-start gap-4 p-3 rounded-lg border border-swiss-gray/50 animate-fade-in animate-fade-in-delay-${Math.min(i + 1, 5)}`}>

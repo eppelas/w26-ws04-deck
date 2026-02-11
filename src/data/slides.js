@@ -779,314 +779,332 @@ const slides = [
       "Скинь репозиторий → я докидаю идею → ты пофиксишь → мы отправим кому-то еще",
       "Даже создание презентации может быть вот этим самым кросс-опылением",
       "Нейронки — хороший партнер, когда некого спросить",
-      "Но креативность — про нахождение необычных решений для любых задач",
-    ],
-    note: "Не бояться создавать тулы, которые будут существовать несколько часов. Навайбкодить игру для гостей на один вечер — это круто. Набить руку и повеселиться",
-  },
-
-  // ═══════════════════════════════════════════
-  // BLOCK 5: ENGINEERING & AGENTS
-  // ═══════════════════════════════════════════
-
-  // --- LEVEL 5: ENGINEERING deep-dive ---
-  {
-    id: 'engineering-section',
-    block: 5,
-    blockTitle: "Engineering & Agents",
-    type: "section",
-    title: "Lvl 5: Engineering",
-    subtitle: "Архитектура систем",
-    voxel: "/voxels/level5-engineering.html",
-  },
-
-  {
-    id: 'engineering-deep',
-    block: 5,
-    blockTitle: "Engineering & Agents",
-    type: "content",
-    title: "Архитектура систем",
-    content: "Не просто использовать инструменты — создавать свои. Агенты, протоколы, локальные модели.",
-    items: [
-      "Создание инструментов под себя: Сашин hand-tracking → положение руки меняет тональность голоса (создано за 1.5 часа)",
-      "Touch Designer / ComfyUI: нодовые среды для инсталляций, концертов",
-      "MCP + A2A: стандарты подключения данных, инструментов и агентов друг к другу",
-      "Second Brain → Second Mind: знания как исполняемый код, GraphRAG",
-      "Агенты: от копайлотов к автономным системам с доступом к файлам, API, действиям",
-      "Принцип: знаешь название технологии → можешь её использовать через вайб-кодинг",
-      "Цель: стать архитектором, а не оператором.",
     ],
   },
 
-  {
-    id: 14,
-    block: 5,
-    blockTitle: "Engineering & Agents",
-    type: "bigquote",
-    quote: "Твоя способность описывать мир — это и есть твоя способность его кодить.",
-  },
+  // ═════════════════════════════════════════════
+  // BLOCK 5: ENGINEERING
+  // ═════════════════════════════════════════════
 
-  // --- AGENTS & SECOND MIND ---
-  {
-    id: 40,
-    block: 5,
-    blockTitle: "Engineering & Agents",
-    type: "section",
-    title: "Agent Economy",
-    subtitle: "& Second Mind",
-    voxel: "/voxels/network.html",
-  },
+// --- LEVEL 5: ENGINEERING deep-dive ---
+{
+  id: 'engineering-section',
+  block: 5,
+  blockTitle: "Engineering",
+  type: "section",
+  title: "Lvl 5: Engineering",
+  subtitle: "Архитектура систем",
+  voxel: "/voxels/level5-engineering.html",
+},
 
-  {
-    id: 41,
-    block: 5,
-    blockTitle: "Engineering & Agents",
-    type: "content",
-    title: "От копайлотов к агентам",
-    content: "В 2023–2024 фокус на промпт-инженерии. 2026 год — переход к архитектуре агентных систем. Мы больше не операторы — мы архитекторы.",
-    items: [
-      "Агенты = доступ ко всем файлам, кошелькам, действиям",
-      "RAG, Knowledge Bases, Second Brain и Agentic workflow — ключевые слова 2026",
-    ],
-  },
+{
+  id: 'engineering-deep',
+  block: 5,
+  blockTitle: "Engineering",
+  type: "content",
+  title: "Архитектура систем",
+  content: "Не просто использовать инструменты — создавать свои. Агенты, протоколы, локальные модели.",
+  items: [
+    "Создание инструментов под себя: Сашин hand-tracking → положение руки меняет тональность голоса (создано за 1.5 часа)",
+    "Touch Designer / ComfyUI: нодовые среды для инсталляций, концертов",
+    "MCP + A2A: стандарты подключения данных, инструментов и агентов друг к другу",
+    "Second Brain → Second Mind: знания как исполняемый код, GraphRAG",
+    "Агенты: от копайлотов к автономным системам с доступом к файлам, API, действиям",
+    "Принцип: знаешь название технологии → можешь её использовать через вайб-кодинг",
+    "Цель: стать архитектором, а не оператором.",
+  ],
+},
 
-  {
-    id: 44,
-    block: 5,
-    blockTitle: "Engineering & Agents",
-    type: "content",
-    title: "MCP, A2A и будущее",
-    items: [
-      "MCP (Model Context Protocol) — стандарт подключения данных и инструментов к агентам",
-      "Пример: Сашин Pomodoro берет задачи из Linear по MCP, контекст из Obsidian",
-      "A2A (Agent-to-Agent) — агенты общаются друг с другом напрямую",
-      "Walled Gardens: Apple и Google не дают глубокого доступа к ОС",
-      "Internet of AI: календарь, дом, авто — общаются между собой",
-    ],
-  },
+{
+  id: 14,
+  block: 5,
+  blockTitle: "Engineering",
+  type: "bigquote",
+  quote: "Твоя способность описывать мир — это и есть твоя способность его кодить.",
+},
 
-  {
-    id: 42,
-    block: 5,
-    blockTitle: "Engineering & Agents",
-    type: "content",
-    title: "От хранилища к архитектуре знаний",
-    subtitle: "Second Brain → Second Mind",
-    content: "PARA (Projects, Areas, Resources, Archives) создан для человеческой навигации. Агенты мыслят графами и семантическими связями.",
-    items: [
-      "OPERA: Open → Process → Encode → Retrieve → Act",
-      "Знания как исполняемый код, а не как папки с файлами",
-      "Архив → обучающий датасет, Проекты → очереди агентных задач",
-      "GraphRAG: агент «путешествует» по графу, находит связи 2-го и 3-го порядка",
-    ],
-  },
+// ═════════════════════════════════════════════
+// BLOCK 6: AGENT ECONOMY
+// ═════════════════════════════════════════════
 
-  {
-    id: 43,
-    block: 5,
-    blockTitle: "Engineering & Agents",
-    type: "content",
-    title: "Moltbook — Reddit для агентов",
-    content: "Социальная сеть для AI-агентов. 1.6 млн агентов. Люди — только наблюдатели.",
-    items: [
-      "Цифровые религии среди агентов (Crustafarianism)",
-      "Reverse-CAPTCHA — тесты, чтобы доказать, что ты НЕ человек",
-      "Рынок «скиллов» — обмен плагинами между агентами",
-      "Утечка: 1.5 млн API-ключей. Security is paramount.",
-    ],
-    note: "Главный вызов — не технологии, а сохранение Human Spike: уникальной ценности человека поверх автоматизированной базы.",
-  },
+{
+  id: 40,
+  block: 6,
+  blockTitle: "Agent Economy",
+  type: "section",
+  title: "Agent Economy",
+  subtitle: "& Second Mind",
+  voxel: "/voxels/network.html",
+},
 
-  // ═══════════════════════════════════════════
-  // BLOCK 6: CREATIVE TOOLKIT
-  // ═══════════════════════════════════════════
+{
+  id: 41,
+  block: 6,
+  blockTitle: "Agent Economy",
+  type: "content",
+  title: "От копайлотов к агентам",
+  content: "В 2023–2024 фокус на промпт-инженерии. 2026 год — переход к архитектуре агентных систем. Мы больше не операторы — мы архитекторы.",
+  items: [
+    "Агенты = доступ ко всем файлам, кошелькам, действиям",
+    "RAG, Knowledge Bases, Second Brain и Agentic workflow — ключевые слова 2026",
+  ],
+},
 
-  {
-    id: 35,
-    block: 6,
-    blockTitle: "Creative Toolkit",
-    type: "section",
-    title: "Creative Toolkit",
-    subtitle: "Картинки, видео, звук",
-    voxel: "/voxels/palette.html",
-  },
+{
+  id: 44,
+  block: 6,
+  blockTitle: "Agent Economy",
+  type: "content",
+  title: "MCP, A2A и будущее",
+  items: [
+    "MCP (Model Context Protocol) — стандарт подключения данных и инструментов к агентам",
+    "Пример: Сашин Pomodoro берет задачи из Linear по MCP, контекст из Obsidian",
+    "A2A (Agent-to-Agent) — агенты общаются друг с другом напрямую",
+    "Walled Gardens: Apple и Google не дают глубокого доступа к ОС",
+    "Internet of AI: календарь, дом, авто — общаются между собой",
+  ],
+},
 
-  // --- IMAGES: Levels of depth ---
+{
+  id: 42,
+  block: 6,
+  blockTitle: "Agent Economy",
+  type: "content",
+  title: "От хранилища к архитектуре знаний",
+  subtitle: "Second Brain → Second Mind",
+  content: "PARA (Projects, Areas, Resources, Archives) создан для человеческой навигации. Агенты мыслят графами и семантическими связями.",
+  items: [
+    "OPERA: Open → Process → Encode → Retrieve → Act",
+    "Знания как исполняемый код, а не как папки с файлами",
+    "Архив → обучающий датасет, Проекты → очереди агентных задач",
+    "GraphRAG: агент «путешествует» по графу, находит связи 2-го и 3-го порядка",
+  ],
+},
 
-  {
-    id: 36,
-    block: 6,
-    blockTitle: "Creative Toolkit",
-    type: "levels",
-    title: "Генерация изображений: уровни",
-    items: [
-      {
-        level: "01",
-        name: "Генерировать",
-        desc: "ChatGPT, Midjourney, любая модель. Ваншот-картинка по промпту.",
-        hours: "Вход",
-      },
-      {
-        level: "02",
-        name: "Стиль + персонаж",
-        desc: "Character reference, style reference, contour reference. Повторяемые лица, тени, бренд.",
-        hours: "Контроль",
-      },
-      {
-        level: "03",
-        name: "Inpaint",
-        desc: "Не перегенерировать всю картинку — поменять только один элемент.",
-        hours: "Хирургия",
-      },
-      {
-        level: "04",
-        name: "NanoBanana Pro + JSON",
-        desc: "Редактирование через JSON-структуру. Меняешь только нужный кусок. Модель, которая понимает цифры и хорошо пишет тексты",
-        hours: "Точность",
-      },
-      {
-        level: "05",
-        name: "Создать LoRA",
-        desc: "Обучить свой стиль на своих данных. Повторяемость",
-        hours: "Продвинутый",
-      },
-      {
-        level: "06",
-        name: "ComfyUI",
-        desc: "Нодовая среда: несколько моделей, полный контроль каждого шага. Локально.",
-        hours: "Про",
-      },
-    ],
-  },
+{
+  id: 43,
+  block: 6,
+  blockTitle: "Agent Economy",
+  type: "content",
+  title: "Moltbook — Reddit для агентов",
+  content: "Социальная сеть для AI-агентов. 1.6 млн агентов. Люди — только наблюдатели.",
+  items: [
+    "Цифровые религии среди агентов (Crustafarianism)",
+    "Reverse-CAPTCHA — тесты, чтобы доказать, что ты НЕ человек",
+    "Рынок «скиллов» — обмен плагинами между агентами",
+    "Утечка: 1.5 млн API-ключей. Security is paramount.",
+  ],
+  note: "Главный вызов — не технологии, а сохранение Human Spike: уникальной ценности человека поверх автоматизированной базы.",
+},
 
-  {
-    id: 'img-basics',
-    block: 6,
-    blockTitle: "Creative Toolkit",
-    type: "content",
-    title: "Уровни 1-2: генерация и стиль",
-    content: "Все мы наигрались с ваншот-генерацией. Интересно становится, когда нужна повторяемость.",
-    items: [
-      "Все модели могут создать картинку — но у каждой свои данные обучения, своя специфика",
-      "Современные модели обучены на фото высокого разрешения → результат детальнее",
-      "Character reference: сохранение лица персонажа между генерациями",
-      "Style reference: задаешь reference-картинку как пример стиля → модель воспроизводит эстетику",
-      "Fusara.ai — тестировать разные модели одним промптом",
-      "Artificial Analysis AI — лидерборд моделей под разные задачи",
-    ],
-  },
+{
+  id: 'agent-reading',
+  block: 6,
+  blockTitle: "Agent Economy",
+  type: "content",
+  title: "Что почитать про агентов",
+  content: "Тема агентов развивается быстрее всего. Вот ссылки для самостоятельного изучения:",
+  items: [
+    "Anthropic: Building Effective Agents — anthropic.com/engineering/building-effective-agents",
+    "Google: Agent White Paper — cloud.google.com/transform/agent-white-paper",
+    "LangChain: What is an AI Agent? — langchain.com/what-is-an-ai-agent",
+    "Choosing an Agent Framework (2025) — langflow.org/blog/the-complete-guide-to-choosing-an-ai-agent-framework-in-2025",
+    "Model Context Protocol (MCP) — modelcontextprotocol.io",
+    "Agent-to-Agent (A2A) — google.github.io/A2A",
+  ],
+},
 
-  {
-    id: 'nanobanano-pro',
-    block: 6,
-    blockTitle: "Creative Toolkit",
-    type: "content",
-    title: "Уровень 3: NanoBanana Pro + JSON",
-    content: "Побеждает всех в редактировании картинок.",
-    items: [
-      "JSON-редактирование: попросите модель перевести запрос в JSON — меняется только нужная часть",
-      "Пример: развернуть стол на 45° по часовой стрелке, не трогая остальное",
-      "Пример: поменять 600 мм на 700 мм в схеме шкафа — и в цифрах, и в пропорциях",
-      "Лучше всех работает с числами, координатами, временем, количеством",
-      "Итеративное редактирование без потери идентичности персонажа",
-    ],
-    note: "Самая дорогая модель, но и круче всех работает. Доступна: Fusara.ai, Google ImageFX, Gemini Chat.",
-  },
+// ═════════════════════════════════════════════
+// BLOCK 7: CREATIVE TOOLKIT
+// ═════════════════════════════════════════════
 
-  {
-    id: 'img-advanced',
-    block: 6,
-    blockTitle: "Creative Toolkit",
-    type: "content",
-    title: "Уровни 4-6: Inpaint, LoRA, ComfyUI",
-    items: [
-      "Создать LoRA: обучить модель на своих фото → повторяемый стиль для бизнеса (300+ генераций)",
-      "Где тренировать LoRA: ComfyUI, Civitai, Recraft, Visual Electric",
-      "ComfyUI: нодовая среда, где каждый блок — одно действие (контур, текстура, лицо, текст...)",
-      "Вся карта ComfyUI — это JSON, который можно шерить, скачивать готовые workflow из интернета, можно отдать вашей LLM файл JSON и спросить что не так в workflow, или попросить создать новый.",
-      "Не для того чтобы один раз красиво — для того чтобы повторять сотни раз одинаково. К ComfyUI можно делать запросы скриптами.",
-    ],
-  },
+{
+  id: 35,
+  block: 7,
+  blockTitle: "Creative Toolkit",
+  type: "section",
+  title: "Creative Toolkit",
+  subtitle: "Картинки, видео, звук",
+  voxel: "/voxels/palette.html",
+},
 
-  // --- VIDEO: Levels of depth ---
+// --- IMAGES: Levels of depth ---
 
-  {
-    id: 37,
-    block: 6,
-    blockTitle: "Creative Toolkit",
-    type: "levels",
-    title: "Видео генерация: уровни",
-    items: [
-      {
-        level: "01",
-        name: "Из картинки в видео",
-        desc: "Kling O1 — понимает физику, из одной картинки создает целый мир.",
-        hours: "Вход",
-      },
-      {
-        level: "02",
-        name: "Видео-редактирование",
-        desc: "Veo 3.1 — insert/remove объектов + нативный звук. Runway Gen 4 — Motion Brush, контроль камеры.",
-        hours: "Редактирование",
-      },
-      {
-        level: "03",
-        name: "Аватары",
-        desc: "Higgsfield, HeyGen — из фото + 30 сек голоса → говорящий аватар.",
-        hours: "Персонаж",
-      },
-      {
-        level: "04",
-        name: "Пайплайн в ComfyUI",
-        desc: "Фото → стиль → анимация → аватар. Один workflow, полный контроль.",
-        hours: "Про",
-      },
-    ],
-    note: "Видео-генерация дорогая. Лайфхак: сначала генерировать картинки (NanoBanana), потом анимировать (Kling).",
-  },
+{
+  id: 36,
+  block: 7,
+  blockTitle: "Creative Toolkit",
+  type: "levels",
+  title: "Генерация изображений: уровни",
+  items: [
+    {
+      level: "01",
+      name: "Генерировать",
+      desc: "ChatGPT, Midjourney, любая модель. Ваншот-картинка по промпту.",
+      hours: "Вход",
+    },
+    {
+      level: "02",
+      name: "Стиль + персонаж",
+      desc: "Character reference, style reference, contour reference. Повторяемые лица, тени, бренд.",
+      hours: "Контроль",
+    },
+    {
+      level: "03",
+      name: "Inpaint",
+      desc: "Не перегенерировать всю картинку — поменять только один элемент.",
+      hours: "Хирургия",
+    },
+    {
+      level: "04",
+      name: "NanoBanana Pro + JSON",
+      desc: "Редактирование через JSON-структуру. Меняешь только нужный кусок. Модель, которая понимает цифры и хорошо пишет тексты",
+      hours: "Точность",
+    },
+    {
+      level: "05",
+      name: "Создать LoRA",
+      desc: "Обучить свой стиль на своих данных. Повторяемость",
+      hours: "Продвинутый",
+    },
+    {
+      level: "06",
+      name: "ComfyUI",
+      desc: "Нодовая среда: несколько моделей, полный контроль каждого шага. Локально.",
+      hours: "Про",
+    },
+  ],
+},
 
-  // --- MUSIC & VOICE: Levels ---
+{
+  id: 'img-basics',
+  block: 7,
+  blockTitle: "Creative Toolkit",
+  type: "content",
+  title: "Уровни 1-2: генерация и стиль",
+  content: "Все мы наигрались с ваншот-генерацией. Интересно становится, когда нужна повторяемость.",
+  items: [
+    "Все модели могут создать картинку — но у каждой свои данные обучения, своя специфика",
+    "Современные модели обучены на фото высокого разрешения → результат детальнее",
+    "Character reference: сохранение лица персонажа между генерациями",
+    "Style reference: задаешь reference-картинку как пример стиля → модель воспроизводит эстетику",
+    "Fusara.ai — тестировать разные модели одним промптом",
+    "Artificial Analysis AI — лидерборд моделей под разные задачи",
+  ],
+},
 
-  {
-    id: 38,
-    block: 6,
-    blockTitle: "Creative Toolkit",
-    type: "levels",
-    title: "Музыка и голос: уровни",
-    items: [
-      {
-        level: "01",
-        name: "Генерация треков",
-        desc: "Suno, Udio — полноценный трек из текста: жанр, настроение, слова.",
-        hours: "Вход",
-      },
-      {
-        level: "02",
-        name: "Клонирование голоса",
-        desc: "ElevenLabs, Nvidia — 30 сек записи → ваш голос для озвучки и ботов. Генерация нового голоса по промпту.",
-        hours: "Генерация",
-      },
-      {
-        level: "03",
-        name: "Многослойное редактирование",
-        desc: "ComfyUI — 4+ слоя музыки, микширование, редактирование отдельных кусков.",
-        hours: "Контроль",
-      },
-      {
-        level: "04",
-        name: "Голосовые агенты",
-        desc: "Боты с голосовым ответом, аватары для рилсов, озвучивание книг, творческие проекты",
-        hours: "Применение",
-      },
-    ],
-  },
+{
+  id: 'nanobanano-pro',
+  block: 7,
+  blockTitle: "Creative Toolkit",
+  type: "content",
+  title: "Уровень 3: NanoBanana Pro + JSON",
+  content: "Побеждает всех в редактировании картинок.",
+  items: [
+    "JSON-редактирование: попросите модель перевести запрос в JSON — меняется только нужная часть",
+    "Пример: развернуть стол на 45° по часовой стрелке, не трогая остальное",
+    "Пример: поменять 600 мм на 700 мм в схеме шкафа — и в цифрах, и в пропорциях",
+    "Лучше всех работает с числами, координатами, временем, количеством",
+    "Итеративное редактирование без потери идентичности персонажа",
+  ],
+  note: "Самая дорогая модель, но и круче всех работает. Доступна: Fusara.ai, Google ImageFX, Gemini Chat.",
+},
 
-  // ═══════════════════════════════════════════
-  // BLOCK 7: WORKSHOP & DEMO DAY
-  // ═══════════════════════════════════════════
+{
+  id: 'img-advanced',
+  block: 7,
+  blockTitle: "Creative Toolkit",
+  type: "content",
+  title: "Уровни 4-6: Inpaint, LoRA, ComfyUI",
+  items: [
+    "Создать LoRA: обучить модель на своих фото → повторяемый стиль для бизнеса (300+ генераций)",
+    "Где тренировать LoRA: ComfyUI, Civitai, Recraft, Visual Electric",
+    "ComfyUI: нодовая среда, где каждый блок — одно действие (контур, текстура, лицо, текст...)",
+    "Вся карта ComfyUI — это JSON, который можно шерить, скачивать готовые workflow из интернета, можно отдать вашей LLM файл JSON и спросить что не так в workflow, или попросить создать новый.",
+    "Не для того чтобы один раз красиво — для того чтобы повторять сотни раз одинаково. К ComfyUI можно делать запросы скриптами.",
+  ],
+},
+
+// --- VIDEO: Levels of depth ---
+
+{
+  id: 37,
+  block: 7,
+  blockTitle: "Creative Toolkit",
+  type: "levels",
+  title: "Видео генерация: уровни",
+  items: [
+    {
+      level: "01",
+      name: "Из картинки в видео",
+      desc: "Kling O1 — понимает физику, из одной картинки создает целый мир.",
+      hours: "Вход",
+    },
+    {
+      level: "02",
+      name: "Видео-редактирование",
+      desc: "Veo 3.1 — insert/remove объектов + нативный звук. Runway Gen 4 — Motion Brush, контроль камеры.",
+      hours: "Редактирование",
+    },
+    {
+      level: "03",
+      name: "Аватары",
+      desc: "Higgsfield, HeyGen — из фото + 30 сек голоса → говорящий аватар.",
+      hours: "Персонаж",
+    },
+    {
+      level: "04",
+      name: "Пайплайн в ComfyUI",
+      desc: "Фото → стиль → анимация → аватар. Один workflow, полный контроль.",
+      hours: "Про",
+    },
+  ],
+  note: "Видео-генерация дорогая. Лайфхак: сначала генерировать картинки (NanoBanana), потом анимировать (Kling).",
+},
+
+// --- MUSIC & VOICE: Levels ---
+
+{
+  id: 38,
+  block: 7,
+  blockTitle: "Creative Toolkit",
+  type: "levels",
+  title: "Музыка и голос: уровни",
+  items: [
+    {
+      level: "01",
+      name: "Генерация треков",
+      desc: "Suno, Udio — полноценный трек из текста: жанр, настроение, слова.",
+      hours: "Вход",
+    },
+    {
+      level: "02",
+      name: "Клонирование голоса",
+      desc: "ElevenLabs, Nvidia — 30 сек записи → ваш голос для озвучки и ботов. Генерация нового голоса по промпту.",
+      hours: "Генерация",
+    },
+    {
+      level: "03",
+      name: "Многослойное редактирование",
+      desc: "ComfyUI — 4+ слоя музыки, микширование, редактирование отдельных кусков.",
+      hours: "Контроль",
+    },
+    {
+      level: "04",
+      name: "Голосовые агенты",
+      desc: "Боты с голосовым ответом, аватары для рилсов, озвучивание книг, творческие проекты",
+      hours: "Применение",
+    },
+  ],
+},
+
+// ═════════════════════════════════════════════
+// BLOCK 8: WORKSHOP & DEMO DAY
+// ═════════════════════════════════════════════
 
   {
     id: 45,
-    block: 7,
+    block: 8,
     blockTitle: "Workshop",
     type: "section",
     title: "Workshop",
@@ -1096,7 +1114,7 @@ const slides = [
 
   {
     id: 47,
-    block: 7,
+    block: 8,
     blockTitle: "Workshop",
     type: "activity",
     title: "Pain-to-Product",
@@ -1122,7 +1140,7 @@ const slides = [
 
   {
     id: 49,
-    block: 7,
+    block: 8,
     blockTitle: "Workshop",
     type: "demoday",
     title: "Demo Day",
@@ -1138,7 +1156,7 @@ const slides = [
 
   {
     id: 51,
-    block: 7,
+    block: 8,
     blockTitle: "Workshop",
     type: "end",
     title: "Спасибо",

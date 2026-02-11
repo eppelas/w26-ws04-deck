@@ -8,9 +8,9 @@ import { RotateCcw, ArrowLeft, Plus, Minus } from 'lucide-react'
 
 const INITIAL_OFFSET_X = 200
 const INITIAL_OFFSET_Y = 150
-const GRID_X_SPACING = 380
+const GRID_X_SPACING = 480
 const GRID_Y_SPACING = 320
-const STORAGE_KEY = 'interaction_map_nodes_v9'
+const STORAGE_KEY = 'interaction_map_nodes_v10'
 
 export default function InteractionMap({ onBack }) {
   const [nodes, setNodes] = useState(() => {
@@ -84,22 +84,28 @@ export default function InteractionMap({ onBack }) {
     return () => container.removeEventListener('wheel', onWheel)
   }, [])
 
-  // Compute content bounds for proper scrollable area
-  const CARD_W = 320, CARD_H = 200, PADDING = 200
+  // Compute content bounds with large padding for free scrolling in all directions
+  const CARD_W = 320, CARD_H = 200, EDGE_PAD = 200
+  const CANVAS_PAD = 2000 // extra space on all sides for free scrolling
   const xs = nodes.map(n => n.posX || 0)
   const ys = nodes.map(n => n.posY || 0)
-  const contentW = (Math.max(...xs) + CARD_W + PADDING) 
-  const contentH = (Math.max(...ys) + CARD_H + PADDING)
+  const contentW = CANVAS_PAD * 2 + Math.max(...xs) + CARD_W + EDGE_PAD
+  const contentH = CANVAS_PAD * 2 + Math.max(...ys) + CARD_H + EDGE_PAD
 
-  // Center horizontally, stick to top on mount
+  // Center cards in viewport on mount
   useEffect(() => {
     const center = () => {
       const container = containerRef.current
       if (!container || nodes.length === 0) return
-      const scaledW = contentW * scale
       const vw = container.clientWidth
-      container.scrollLeft = Math.max(0, (scaledW - vw) / 2)
-      container.scrollTop = 0
+      const vh = container.clientHeight
+      // Scroll so the CANVAS_PAD offset (where cards start) is centered
+      const cardsW = (Math.max(...xs) + CARD_W) * scale
+      const cardsH = (Math.max(...ys) + CARD_H) * scale
+      const offsetX = CANVAS_PAD * scale
+      const offsetY = CANVAS_PAD * scale
+      container.scrollLeft = offsetX + (cardsW - vw) / 2
+      container.scrollTop = offsetY + (cardsH - vh) / 2
     }
     requestAnimationFrame(() => requestAnimationFrame(center))
     const t = setTimeout(center, 150)
@@ -127,10 +133,10 @@ export default function InteractionMap({ onBack }) {
       return (
         <WobblyArrow
           key={`${sourceNode.id}-${targetId}`}
-          startX={(sourceNode.posX || 0) + cardWidth / 2}
-          startY={(sourceNode.posY || 0) + cardHeight / 2}
-          endX={(targetNode.posX || 0) + cardWidth / 2}
-          endY={(targetNode.posY || 0) + cardHeight / 2}
+          startX={(sourceNode.posX || 0) + CANVAS_PAD + cardWidth / 2}
+          startY={(sourceNode.posY || 0) + CANVAS_PAD + cardHeight / 2}
+          endX={(targetNode.posX || 0) + CANVAS_PAD + cardWidth / 2}
+          endY={(targetNode.posY || 0) + CANVAS_PAD + cardHeight / 2}
         />
       )
     }).filter(Boolean)
@@ -161,7 +167,17 @@ export default function InteractionMap({ onBack }) {
         <div style={{ width: `${contentW * scale}px`, height: `${contentH * scale}px` }} data-bg="true">
           <div
             className="relative origin-top-left transition-transform duration-75 ease-linear"
-            style={{ transform: `scale(${scale})`, width: `${contentW}px`, height: `${contentH}px` }}
+            style={{
+              transform: `scale(${scale})`,
+              width: `${contentW}px`,
+              height: `${contentH}px`,
+              backgroundImage: `
+                linear-gradient(to right, rgba(139,92,246,0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(139,92,246,0.06) 1px, transparent 1px)
+              `,
+              backgroundSize: `${GRID_X_SPACING}px ${GRID_Y_SPACING}px`,
+              backgroundPosition: `${INITIAL_OFFSET_X - 40}px ${INITIAL_OFFSET_Y - 30}px`
+            }}
             data-bg="true"
           >
             <div className="absolute inset-0 pointer-events-none z-0">
@@ -176,7 +192,7 @@ export default function InteractionMap({ onBack }) {
                 onSelect={setSelectedNode}
                 onUpdate={handleUpdateNode}
                 onDragStart={handleDragStart}
-                style={{ transform: `translate(${node.posX}px, ${node.posY}px)` }}
+                style={{ transform: `translate(${(node.posX || 0) + CANVAS_PAD}px, ${(node.posY || 0) + CANVAS_PAD}px)` }}
               />
             ))}
           </div>
